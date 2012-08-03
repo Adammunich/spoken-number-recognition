@@ -1,10 +1,12 @@
 package main;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Frame {
 	private AudioFormat format;
@@ -31,10 +33,17 @@ public class Frame {
 		this.buffer = buffer;
 	}
 	
-	public ArrayList<Frame> getFrames(String fileName, double duration, double overlapping) throws Exception {
+	public ArrayList<Frame> getFrames(String fileName, double duration, double overlapping) {
 		ArrayList<Frame> frames = new ArrayList<Frame>();
 		File file = new File(fileName);
-		AudioInputStream audioStream = AudioSystem.getAudioInputStream(file);
+		AudioInputStream audioStream = null;
+		try {
+			audioStream = AudioSystem.getAudioInputStream(file);
+		} catch (UnsupportedAudioFileException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		AudioFormat audioFormat = audioStream.getFormat();
 		
 		double sampleRate = audioFormat.getSampleRate();
@@ -42,7 +51,11 @@ public class Frame {
 		int over = (int) Math.round(overlapping * sampleRate);
 		
 		byte[] buffer = new byte[(int) (audioFormat.getFrameRate() * audioFormat.getSampleSizeInBits())];
-		audioStream.read(buffer, 0, buffer.length);
+		try {
+			audioStream.read(buffer, 0, buffer.length);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		for(int curr = 0; curr <= buffer.length; curr += dur) {
 			if (curr - over >= 0){
