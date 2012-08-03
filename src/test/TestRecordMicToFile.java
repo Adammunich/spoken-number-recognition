@@ -15,7 +15,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 
 public class TestRecordMicToFile {
-
+	
 	public static void main(String[] args) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
 
 		AudioFormat format = new AudioFormat(8000, 8, 1, true, false);
