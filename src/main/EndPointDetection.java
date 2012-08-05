@@ -2,6 +2,12 @@ package main;
 
 import java.util.List;
 
+/**
+ * @author niktrk
+ * 
+ */
+// TODO add threshold for frequencies, probability density and remove short
+// speech segments
 public class EndPointDetection {
 
 	private static final double OFFSET_FACTOR = 1d;

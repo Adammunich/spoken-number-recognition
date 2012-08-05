@@ -1,13 +1,7 @@
 package test;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.List;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 import main.AudioFileUtil;
 import main.EndPointDetection;
@@ -17,7 +11,7 @@ import main.Window;
 
 public class TestRecordMicToFile {
 
-	public static void main(String[] args) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+	public static void main(String[] args) {
 
 		AudioFileUtil.recordFromMicToFile("test.wav", 3100);
 
@@ -42,13 +36,7 @@ public class TestRecordMicToFile {
 			testit++;
 		}
 
-		byte[] outArray = outtrans.toByteArray();
-
-		AudioInputStream audioInput = new AudioInputStream(new ByteArrayInputStream(outArray), AudioFileUtil.AUDIO_FORMAT, outArray.length
-				/ AudioFileUtil.AUDIO_FORMAT.getFrameSize());
-
-		AudioFileUtil.writeFromStreamToFile("test1.wav", audioInput);
-
+		AudioFileUtil.writeFromByteArrayToFile("test1.wav", outtrans.toByteArray());
 	}
 
 }

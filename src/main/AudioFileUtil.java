@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.sound.sampled.AudioFileFormat;
@@ -47,12 +48,13 @@ public class AudioFileUtil {
 		dataLine.drain();
 		dataLine.close();
 
-		byte[] outArray = out.toByteArray();
+		writeFromByteArrayToFile(filename, out.toByteArray());
+	}
 
-		AudioInputStream audioInput = new AudioInputStream(new ByteArrayInputStream(outArray), AUDIO_FORMAT, outArray.length
+	public static void writeFromByteArrayToFile(String filename, byte[] byteArray) {
+		AudioInputStream audioInputStream = new AudioInputStream(new ByteArrayInputStream(byteArray), AUDIO_FORMAT, byteArray.length
 				/ AUDIO_FORMAT.getFrameSize());
-
-		writeFromStreamToFile(filename, audioInput);
+		writeFromStreamToFile(filename, audioInputStream);
 	}
 
 	public static void writeFromStreamToFile(String filename, AudioInputStream audioInputStream) {
@@ -88,23 +90,11 @@ public class AudioFileUtil {
 		}
 
 		for (int i = 0; i < buffer.length; i += offset) {
-			frames.add(new Frame(getSubarray(buffer, i, length)));
+			frames.add(new Frame(Arrays.copyOfRange(buffer, i, i + length)));
 			System.out.println(i + " - " + (i + length));
 		}
 
 		return frames;
-	}
-
-	private static byte[] getSubarray(byte[] array, int start, int length) {
-		byte[] ret = new byte[length];
-		for (int i = 0; i < length; i++) {
-			if (start + i < array.length) {
-				ret[i] = array[start + i];
-			} else {
-				ret[i] = 0;
-			}
-		}
-		return ret;
 	}
 
 	private AudioFileUtil() {
