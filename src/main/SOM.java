@@ -3,6 +3,7 @@ package main;
 import java.util.Random;
 
 public class SOM {
+
 	private int numInput;
 	private int numOutput;
 	private double[][] weights;
@@ -50,9 +51,9 @@ public class SOM {
 
 	public int findWinner(Input input) {
 		double[] values = input.getValues();
-		if (values.length != numInput)
+		if (values.length != numInput) {
 			return -1;
-		else {
+		} else {
 			int winner = 0;
 			double min = Double.MAX_VALUE;
 			double currentDist = 0;
@@ -66,14 +67,13 @@ public class SOM {
 			return winner;
 		}
 	}
-	
+
 	private boolean epoch(TrainingSet ts) {
 		Input input = ts.getRandomInput();
 		input.normalize();
 		if (input.getValues().length != numInput) {
 			return false;
-		} 
-		else {
+		} else {
 			int winner = findWinner(input);
 			adjustWeights(input, winner);
 			return true;
@@ -90,10 +90,9 @@ public class SOM {
 	}
 
 	private void adjustWeights(Input input, int winner) {
-		double [] values = input.getValues();
+		double[] values = input.getValues();
 		for (int i = 0; i < numInput; i++) {
-			weights[winner][i] += getLearningRate()
-					* (values[i] - weights[winner][i]);
+			weights[winner][i] += getLearningRate() * (values[i] - weights[winner][i]);
 		}
 	}
 
