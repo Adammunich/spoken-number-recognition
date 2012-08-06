@@ -36,7 +36,6 @@ public class Record extends SwingWorker<Void, Void> {
 				out.write(buffer, 0, count);
 			}
 			progress = (int) (System.currentTimeMillis() - start);
-			System.out.println(progress);
 			setProgress(progress/51);
 		}
 		dataLine.drain();
