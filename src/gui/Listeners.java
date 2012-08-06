@@ -164,7 +164,6 @@ class RecordListener implements ActionListener, PropertyChangeListener {
 	public void propertyChange(PropertyChangeEvent evt) {
 		if ("progress" == evt.getPropertyName()) {
 			int progress = (Integer) evt.getNewValue();
-			System.out.println(progress);
 			progressBar.setValue(progress);
 		}
 	}
