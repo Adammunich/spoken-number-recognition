@@ -1,4 +1,4 @@
-package main;
+package som;
 
 public class Input {
 

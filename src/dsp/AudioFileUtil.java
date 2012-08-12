@@ -1,12 +1,9 @@
-package main;
+package dsp;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -22,9 +19,14 @@ import javax.sound.sampled.UnsupportedAudioFileException;
  */
 public class AudioFileUtil {
 
-	public static final AudioFormat AUDIO_FORMAT = new AudioFormat(8000, 8, 1, true, false);
+	public static final int SAMPLE_RATE = 8000;
+	public static final int MAX_FREQUENCY = SAMPLE_RATE >> 1;
+	public static final int MIN_FREQUENCY = 0;
+	public static final int FRAME_SAMPLE_LENGTH = 256;
+	public static final double FREQUENCY_STEP = ((double) MAX_FREQUENCY) / ((double) (FRAME_SAMPLE_LENGTH >> 1));
+	public static final AudioFormat AUDIO_FORMAT = new AudioFormat(SAMPLE_RATE, 8, 1, true, false);
 
-	public static void recordFromMicToFile(String filename, long lengthInMillis) {
+	public static byte[] readFromMicToByteArray(long lengthInMillis) {
 		TargetDataLine dataLine = null;
 		try {
 			dataLine = AudioSystem.getTargetDataLine(AUDIO_FORMAT);
@@ -48,7 +50,33 @@ public class AudioFileUtil {
 		dataLine.drain();
 		dataLine.close();
 
-		writeFromByteArrayToFile(filename, out.toByteArray());
+		return out.toByteArray();
+	}
+
+	public static byte[] readFromFileToByteArray(String filename) {
+		AudioInputStream audioStream = null;
+		try {
+			audioStream = AudioSystem.getAudioInputStream(AUDIO_FORMAT, AudioSystem.getAudioInputStream(new File(filename)));
+		} catch (UnsupportedAudioFileException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+		byte[] buffer = null;
+		try {
+			System.out.println(audioStream.available());
+			buffer = new byte[audioStream.available()];
+			audioStream.read(buffer, 0, buffer.length);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return buffer;
+	}
+
+	public static void writeFromMicToFile(String filename, long lengthInMillis) {
+		writeFromByteArrayToFile(filename, readFromMicToByteArray(lengthInMillis));
 	}
 
 	public static void writeFromByteArrayToFile(String filename, byte[] byteArray) {
@@ -65,36 +93,6 @@ public class AudioFileUtil {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public static List<Frame> getFramesFromFile(String filename, int length, double overlapping) {
-		List<Frame> frames = new ArrayList<Frame>();
-		AudioInputStream audioStream = null;
-		try {
-			audioStream = AudioSystem.getAudioInputStream(AUDIO_FORMAT, AudioSystem.getAudioInputStream(new File(filename)));
-		} catch (UnsupportedAudioFileException e1) {
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
-		int offset = length - (int) (length * overlapping);
-
-		byte[] buffer = null;
-		try {
-			System.out.println(audioStream.available());
-			buffer = new byte[audioStream.available()];
-			audioStream.read(buffer, 0, buffer.length);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		for (int i = 0; i < buffer.length; i += offset) {
-			frames.add(new Frame(Arrays.copyOfRange(buffer, i, i + length)));
-			System.out.println(i + " - " + (i + length));
-		}
-
-		return frames;
 	}
 
 	private AudioFileUtil() {

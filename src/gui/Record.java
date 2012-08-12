@@ -36,31 +36,25 @@ public class Record extends SwingWorker<Void, Void> {
 				out.write(buffer, 0, count);
 			}
 			progress = (int) (System.currentTimeMillis() - start);
-			setProgress(progress/51);
+			setProgress(progress / 51);
 		}
 		dataLine.drain();
 		dataLine.close();
 
 		byte[] outArray = out.toByteArray();
 
-		AudioInputStream audioInput = new AudioInputStream(
-				new ByteArrayInputStream(outArray), format, outArray.length
-						/ format.getFrameSize());
+		AudioInputStream audioInput = new AudioInputStream(new ByteArrayInputStream(outArray), format, outArray.length / format.getFrameSize());
 
-		if (AudioSystem.isFileTypeSupported(AudioFileFormat.Type.WAVE,
-				audioInput)) {
-			AudioSystem.write(audioInput, AudioFileFormat.Type.WAVE, new File(
-					"test.wav"));
+		if (AudioSystem.isFileTypeSupported(AudioFileFormat.Type.WAVE, audioInput)) {
+			AudioSystem.write(audioInput, AudioFileFormat.Type.WAVE, new File("test.wav"));
 		}
 		audioInput = AudioSystem.getAudioInputStream(new File("test.wav"));
 		setProgress(100);
 		return null;
 	}
-	
-	
 
 	@Override
-	public void done(){
+	public void done() {
 		setProgress(100);
 
 	}

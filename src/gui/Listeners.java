@@ -31,13 +31,11 @@ class AproveOpenFolder implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent evt) {
-		int returnVal = openFolderDialog.showOpenDialog(openFolderDialog
-				.getParent());
+		int returnVal = openFolderDialog.showOpenDialog(openFolderDialog.getParent());
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			ArrayList<File> list = new ArrayList<File>();
 			getWavFiles(openFolderDialog.getSelectedFile(), list);
-			DefaultListModel<File> dlm = (DefaultListModel<File>) fileList
-					.getModel();
+			DefaultListModel<File> dlm = (DefaultListModel<File>) fileList.getModel();
 			for (int i = 0; i < list.size(); i++) {
 				dlm.addElement(list.get(i));
 			}
@@ -71,8 +69,7 @@ class RemoveFileListener implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		int index = fileList.getSelectedIndex();
 		if (index > -1) {
-			DefaultListModel<File> dlm = (DefaultListModel<File>) fileList
-					.getModel();
+			DefaultListModel<File> dlm = (DefaultListModel<File>) fileList.getModel();
 			dlm.remove(index);
 		}
 	}
@@ -88,13 +85,12 @@ class SaveToFileListener implements ActionListener {
 		this.dialog = dialog;
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		try {
-			DefaultListModel<File> lm = (DefaultListModel<File>) fileList
-					.getModel();
+			DefaultListModel<File> lm = (DefaultListModel<File>) fileList.getModel();
 			dialog.showSaveDialog(dialog.getParent());
-			BufferedWriter output = new BufferedWriter(new FileWriter(
-					dialog.getSelectedFile()));
+			BufferedWriter output = new BufferedWriter(new FileWriter(dialog.getSelectedFile()));
 			for (int i = 0; i < lm.size(); i++) {
 				output.write(lm.getElementAt(i).toString());
 				output.newLine();
@@ -120,11 +116,9 @@ class LoadFromFileListener implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		try {
-			DefaultListModel<File> lm = (DefaultListModel<File>) fileList
-					.getModel();
+			DefaultListModel<File> lm = (DefaultListModel<File>) fileList.getModel();
 			dialog.showOpenDialog(dialog.getParent());
-			BufferedReader input = new BufferedReader(new FileReader(
-					dialog.getSelectedFile()));
+			BufferedReader input = new BufferedReader(new FileReader(dialog.getSelectedFile()));
 			String line = "";
 			File file;
 			lm.clear();
@@ -135,8 +129,7 @@ class LoadFromFileListener implements ActionListener {
 						file = new File(line);
 						lm.addElement(file);
 					} catch (NullPointerException e1) {
-						JOptionPane.showMessageDialog(null, "File " + line
-								+ " doesn't exist.");
+						JOptionPane.showMessageDialog(null, "File " + line + " doesn't exist.");
 					}
 				}
 			}
@@ -154,6 +147,7 @@ class RecordListener implements ActionListener, PropertyChangeListener {
 	private JProgressBar progressBar;
 	Record record;
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		record = new Record();
 		record.execute();

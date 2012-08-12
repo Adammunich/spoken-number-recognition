@@ -1,12 +1,16 @@
-package main;
+package dsp;
 
 /**
  * @author niktrk
  * 
  */
-public class FFT {
+public class FFT implements Transformation {
 
-	private static ComplexNumber[] transform(ComplexNumber[] timeDomain, int length, int offset, int skip) {
+	public FFT() {
+		super();
+	}
+
+	private ComplexNumber[] transform(ComplexNumber[] timeDomain, int length, int offset, int skip) {
 		ComplexNumber[] frequencyDomain = new ComplexNumber[length];
 
 		if (length == 1) {
@@ -30,15 +34,18 @@ public class FFT {
 		return frequencyDomain;
 	}
 
-	public static ComplexNumber[] transform(Frame frame) {
-		ComplexNumber[] timeDomain = new ComplexNumber[frame.getWindowedBuffer().length];
+	@Override
+	public double[] transform(double[] input) {
+		ComplexNumber[] timeDomain = new ComplexNumber[input.length];
 		for (int i = 0; i < timeDomain.length; i++) {
-			timeDomain[i] = new ComplexNumber(frame.getWindowedBuffer()[i]);
+			timeDomain[i] = new ComplexNumber(input[i]);
 		}
-		return transform(timeDomain, timeDomain.length, 0, 1);
-	}
-
-	private FFT() {
+		ComplexNumber[] frequencyDomain = transform(timeDomain, timeDomain.length, 0, 1);
+		double[] frequencyDomainEnergy = new double[frequencyDomain.length];
+		for (int i = 0; i < frequencyDomainEnergy.length; i++) {
+			frequencyDomainEnergy[i] = frequencyDomain[i].getSpectralEnergy();
+		}
+		return frequencyDomainEnergy;
 	}
 
 }
