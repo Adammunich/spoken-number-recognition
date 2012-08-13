@@ -21,7 +21,7 @@ public class MelFilter implements Transformation {
 		centerOfFrequency[0] = AudioFileUtil.MIN_FREQUENCY;
 		for (int i = 1; i <= numberOfTriangularFilters; i++) {
 			centerOfFrequency[i] = fromMelToHz(delta * i);
-			System.out.println(centerOfFrequency[i]);
+			// System.out.println(centerOfFrequency[i]);
 		}
 		centerOfFrequency[numberOfTriangularFilters + 1] = AudioFileUtil.MAX_FREQUENCY;
 	}

@@ -14,7 +14,6 @@ import dsp.MelFilter;
 import dsp.PreEmphasisFilter;
 import dsp.Transformation;
 
-
 public class TestRecordMicToFile {
 
 	public static void main(String[] args) {
@@ -27,7 +26,7 @@ public class TestRecordMicToFile {
 		Transformation window = new HammingWindow();
 		Transformation dft = new FFT();
 		for (Frame frame : frames) {
-			frame.applyTransformation(emphasize);
+			// frame.applyTransformation(emphasize);
 			frame.applyTransformation(window);
 			frame.applyTransformation(dft);
 		}

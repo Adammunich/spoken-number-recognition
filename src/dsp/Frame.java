@@ -43,7 +43,6 @@ public class Frame {
 		int offset = length - (int) (length * overlapping);
 		for (int i = 0; i < bytes.length; i += offset) {
 			frames.add(new Frame(Arrays.copyOfRange(bytes, i, i + length)));
-			System.out.println(i + " - " + (i + length));
 		}
 		return frames;
 	}

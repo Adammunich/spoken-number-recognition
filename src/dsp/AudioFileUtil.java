@@ -85,7 +85,7 @@ public class AudioFileUtil {
 		writeFromStreamToFile(filename, audioInputStream);
 	}
 
-	public static void writeFromStreamToFile(String filename, AudioInputStream audioInputStream) {
+	private static void writeFromStreamToFile(String filename, AudioInputStream audioInputStream) {
 		if (AudioSystem.isFileTypeSupported(AudioFileFormat.Type.WAVE, audioInputStream)) {
 			try {
 				AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, new File(filename));

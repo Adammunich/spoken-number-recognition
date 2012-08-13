@@ -26,7 +26,7 @@ public class EndPointDetection {
 		max = Double.MIN_VALUE;
 		for (int i = 0; i < frames.size(); i++) {
 			spectralEntropy[i] = calculateSpectralEntropy(frames.get(i));
-			System.out.println("epcstral " + spectralEntropy[i]);
+			System.out.println("SpectralEntropy " + spectralEntropy[i]);
 			min = Math.min(min, spectralEntropy[i]);
 			max = Math.max(max, spectralEntropy[i]);
 		}
@@ -40,7 +40,6 @@ public class EndPointDetection {
 		for (int i = 0; i < frame.getBuffer().length / 2; i++) {
 			totalSpectralEnergy += frame.getBuffer()[i];
 		}
-		System.out.println(totalSpectralEnergy);
 		// probability
 		double[] probabilityDensity = new double[frame.getBuffer().length / 2];
 		for (int i = 0; i < probabilityDensity.length; i++) {
@@ -74,9 +73,7 @@ public class EndPointDetection {
 			}
 		}
 		int endIndex = 0;
-		System.out.println("end " + endIndex);
 		for (endIndex = frames.size() - 1; endIndex >= 0; endIndex--) {
-			System.out.println("end " + endIndex);
 			if (spectralEntropy[endIndex] >= threshold) {
 				// break;
 				int previousOffset = previousBelowThresholdOffset(endIndex);
@@ -84,7 +81,6 @@ public class EndPointDetection {
 					break;
 				} else {
 					endIndex -= previousOffset;
-					System.out.println("end " + endIndex);
 				}
 			}
 		}
