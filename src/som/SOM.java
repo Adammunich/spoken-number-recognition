@@ -7,7 +7,7 @@ public class SOM {
 	private int numInput;
 	private int numOutput;
 	private double[][] weights;
-	private double startLearningRate;
+	private double startLearningRate = 0.1;
 	private int numIteration;
 	private int countIteration;
 
@@ -22,30 +22,14 @@ public class SOM {
 		}
 	}
 
-	public int getNumInput() {
-		return numInput;
-	}
-
-	public void setNumInput(int numInput) {
-		this.numInput = numInput;
-	}
-
-	public int getNumOutput() {
-		return numOutput;
-	}
-
-	public void setNumOutput(int numOutput) {
-		this.numOutput = numOutput;
-	}
-
 	public void train(TrainingSet ts, int numIteration) {
 		initWeights();
 		this.numIteration = numIteration;
 		countIteration = 0;
 		boolean ok = true;
-		while (countIteration < numIteration && ok) {
-			ok = epoch(ts);
+		while (countIteration <= numIteration && ok) {
 			countIteration++;
+			ok = epoch(ts);
 		}
 	}
 
@@ -58,7 +42,9 @@ public class SOM {
 			double min = Double.MAX_VALUE;
 			double currentDist = 0;
 			for (int i = 0; i < numOutput; i++) {
+				System.out.println("dist to " + i + " ");
 				currentDist = getDistance(weights[i], values);
+				System.out.println(currentDist);
 				if (currentDist < min) {
 					min = currentDist;
 					winner = i;
@@ -75,6 +61,7 @@ public class SOM {
 			return false;
 		} else {
 			int winner = findWinner(input);
+			System.out.println("winner " + winner);
 			adjustWeights(input, winner);
 			return true;
 		}
@@ -97,15 +84,31 @@ public class SOM {
 	}
 
 	private double getLearningRate() {
-		return startLearningRate * Math.exp(-numIteration / countIteration);
+		return startLearningRate * Math.exp(-((double) countIteration) / numIteration);
 	}
 
 	private double getDistance(double[] a, double[] b) {
-		int dist = 0;
+		double dist = 0;
 		for (int i = 0; i < a.length; i++) {
 			dist += Math.pow(a[i] - b[i], 2);
 		}
 		return Math.sqrt(dist);
+	}
+
+	public int getNumInput() {
+		return numInput;
+	}
+
+	public void setNumInput(int numInput) {
+		this.numInput = numInput;
+	}
+
+	public int getNumOutput() {
+		return numOutput;
+	}
+
+	public void setNumOutput(int numOutput) {
+		this.numOutput = numOutput;
 	}
 
 }

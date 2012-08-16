@@ -6,11 +6,11 @@ import java.util.List;
  * @author niktrk
  * 
  */
-// TODO add threshold for frequencies, probability density
+// FIXME not working 100% fine
 public class EndPointDetection {
 
 	private static final double OFFSET_FACTOR = 1d;
-	private static final int MIN_CONSECUTIVE_SPEECH_FRAMES = 2;
+	private static final int MIN_CONSECUTIVE_SPEECH_FRAMES = 11;
 
 	private List<Frame> frames;
 	private double[] spectralEntropy;
@@ -26,24 +26,26 @@ public class EndPointDetection {
 		max = Double.MIN_VALUE;
 		for (int i = 0; i < frames.size(); i++) {
 			spectralEntropy[i] = calculateSpectralEntropy(frames.get(i));
-			System.out.println("SpectralEntropy " + spectralEntropy[i]);
+			// System.out.println("SpectralEntropy " + spectralEntropy[i]);
 			min = Math.min(min, spectralEntropy[i]);
 			max = Math.max(max, spectralEntropy[i]);
 		}
 		threshold = (max - min) / 2 + OFFSET_FACTOR * min;
-		System.out.println(min + " " + max + " " + threshold);
+		// System.out.println(min + " " + max + " " + threshold);
 	}
 
 	private double calculateSpectralEntropy(Frame frame) {
 		// total energy
 		double totalSpectralEnergy = 0d;
 		for (int i = 0; i < frame.getBuffer().length / 2; i++) {
-			totalSpectralEnergy += frame.getBuffer()[i];
+			if (i * AudioFileUtil.FREQUENCY_STEP > 350 && i * AudioFileUtil.FREQUENCY_STEP < 3750) {
+				totalSpectralEnergy += frame.getBuffer()[i];
+			}
 		}
 		// probability
 		double[] probabilityDensity = new double[frame.getBuffer().length / 2];
 		for (int i = 0; i < probabilityDensity.length; i++) {
-			if (totalSpectralEnergy < 1e-9) {
+			if (totalSpectralEnergy < 1e-9 || (i * AudioFileUtil.FREQUENCY_STEP <= 350 || i * AudioFileUtil.FREQUENCY_STEP >= 3750)) {
 				probabilityDensity[i] = 0d;
 			} else {
 				probabilityDensity[i] = frame.getBuffer()[i] / totalSpectralEnergy;
@@ -63,7 +65,6 @@ public class EndPointDetection {
 		int startIndex = 0;
 		for (startIndex = 0; startIndex < frames.size(); startIndex++) {
 			if (spectralEntropy[startIndex] >= threshold) {
-				// break;
 				int nextOffset = nextBelowThresholdOffset(startIndex);
 				if (nextOffset == -1) {
 					break;
@@ -75,7 +76,6 @@ public class EndPointDetection {
 		int endIndex = 0;
 		for (endIndex = frames.size() - 1; endIndex >= 0; endIndex--) {
 			if (spectralEntropy[endIndex] >= threshold) {
-				// break;
 				int previousOffset = previousBelowThresholdOffset(endIndex);
 				if (previousOffset == -1) {
 					break;

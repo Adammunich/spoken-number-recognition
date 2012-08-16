@@ -4,6 +4,10 @@ public class Input {
 
 	private double[] values;
 
+	public Input(double[] values) {
+		this.values = values;
+	}
+
 	public double[] getValues() {
 		return values;
 	}

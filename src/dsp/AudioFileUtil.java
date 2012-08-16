@@ -65,7 +65,7 @@ public class AudioFileUtil {
 
 		byte[] buffer = null;
 		try {
-			System.out.println(audioStream.available());
+			// System.out.println(audioStream.available());
 			buffer = new byte[audioStream.available()];
 			audioStream.read(buffer, 0, buffer.length);
 		} catch (IOException e) {

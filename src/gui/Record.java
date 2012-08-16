@@ -13,9 +13,6 @@ import javax.swing.SwingWorker;
 
 public class Record extends SwingWorker<Void, Void> {
 
-	protected boolean running;
-	ByteArrayOutputStream out;
-
 	@Override
 	protected Void doInBackground() throws Exception {
 		AudioFormat format = new AudioFormat(8000, 8, 1, true, false);

@@ -63,7 +63,11 @@ public class MelFilter implements Transformation {
 			for (int j = 0; j < input.length / 2; j++) {
 				melCoefficient += input[j] * getTriangleFilterCoefficient(i, j);
 			}
-			result[i - 1] = Math.log(melCoefficient);
+			if (melCoefficient < 1e-9) {
+				result[i - 1] = 0d;
+			} else {
+				result[i - 1] = Math.log(melCoefficient);
+			}
 		}
 
 		return result;
