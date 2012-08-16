@@ -119,7 +119,7 @@ public class MainForm extends JApplet {
 		progressBar.addChangeListener(pbl);
 	}
 
-	private static void centreWindow(JFrame frame) {
+	private static void centerWindow(JFrame frame) {
 		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 		int x = (int) ((dimension.getWidth() - frame.getWidth()) / 2);
 		int y = (int) ((dimension.getHeight() - frame.getHeight()) / 2);
@@ -134,7 +134,7 @@ public class MainForm extends JApplet {
 		applet.init();
 		frame.getContentPane().add(applet);
 		frame.setSize(780, 500);
-		centreWindow(frame);
+		centerWindow(frame);
 		frame.setVisible(true);
 
 	}
