@@ -7,6 +7,7 @@ import som.Input;
 import som.SOM;
 import som.TrainingSet;
 import dsp.AudioFileUtil;
+import dsp.CMN;
 import dsp.DCT;
 import dsp.EndPointDetection;
 import dsp.FFT;
@@ -46,20 +47,26 @@ public class TestRecordMicToFile {
 				// System.out.println(frames.size());
 				// System.out.println(removeStartAndEnd.size());
 
-				Transformation mel = new MelFilter(30);
+				Transformation mel = new MelFilter(23);
 				Transformation dct = new DCT();
 				Transformation sub = new SubRange(1, 14);
-				double[] vals = new double[50 * 13];
-				int k = 0;
 				for (Frame frame : removeStartAndEnd) {
 					frame.applyTransformation(mel);
 					frame.applyTransformation(dct);
 					frame.applyTransformation(sub);
+				}
+
+				double[] vals = new double[50 * 13];
+				int k = 0;
+				Transformation cmn = new CMN(removeStartAndEnd);
+				for (Frame frame : removeStartAndEnd) {
+					frame.applyTransformation(cmn);
 					for (int m = 0; m < 13; m++) {
 						vals[k * 13 + m] = frame.getBuffer()[m];
 					}
 					k++;
 				}
+
 				inputs[index] = new Input(vals);
 				System.out.println(Arrays.toString(vals));
 				index++;
