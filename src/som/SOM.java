@@ -27,15 +27,14 @@ public class SOM {
 		this.weights = new double[numOutput][numInput];
 		for (int i = 0; i < numOutput; i++) {
 			for (int j = 0; j < numInput; j++) {
-				weights[i][j] = 0;
+				weights[i][j] = Math.random() / 10000; // small random number
 			}
 		}
 	}
 
 	public void train(TrainingSet ts, int numIteration) {
-		initWeights();
 		this.numIteration = numIteration;
-		countIteration = 0;
+		this.countIteration = 0;
 		boolean ok = true;
 		while (countIteration <= numIteration && ok) {
 			countIteration++;
@@ -52,9 +51,9 @@ public class SOM {
 			double min = Double.MAX_VALUE;
 			double currentDist = 0;
 			for (int i = 0; i < numOutput; i++) {
-				System.out.println("dist to " + i + " ");
+				// System.out.println("dist to " + i + " ");
 				currentDist = getDistance(weights[i], values);
-				System.out.println(currentDist);
+				// System.out.println(currentDist);
 				if (currentDist < min) {
 					min = currentDist;
 					winner = i;
@@ -66,23 +65,14 @@ public class SOM {
 
 	private boolean epoch(TrainingSet ts) {
 		Input input = ts.getRandomInput();
-		input.normalize();
 		if (input.getValues().length != numInput) {
 			return false;
 		} else {
 			int winner = findWinner(input);
 			indices.add(winner);
-			System.out.println("winner " + winner);
+			// System.out.println("winner " + winner);
 			adjustWeights(input, winner);
 			return true;
-		}
-	}
-
-	private void initWeights() {
-		for (int i = 0; i < numOutput; i++) {
-			for (int j = 0; j < numInput; j++) {
-				weights[i][j] = Math.random() / 10000; // small random number
-			}
 		}
 	}
 
@@ -104,16 +94,16 @@ public class SOM {
 		}
 	}
 
-	private double getLearningRate() {
-		return startLearningRate * Math.exp(-((double) countIteration) / numIteration);
-	}
-
 	private double getDistanceFactor(double distance, double neighbourhoodRadius) {
 		return Math.exp(-distance * distance / (2 * neighbourhoodRadius * neighbourhoodRadius));
 	}
 
 	private double getNeighbourhoodRadius() {
 		return startRadius * Math.exp(-((double) countIteration) / numIteration);
+	}
+
+	private double getLearningRate() {
+		return startLearningRate * Math.exp(-((double) countIteration) / numIteration);
 	}
 
 	// dynamic time warping

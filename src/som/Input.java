@@ -2,21 +2,19 @@ package som;
 
 public class Input {
 
-	private double[] values;
+	private final double[] values;
 
 	public Input(double[] values) {
+		super();
 		this.values = values;
+		normalize();
 	}
 
 	public double[] getValues() {
 		return values;
 	}
 
-	public void setValues(double[] values) {
-		this.values = values;
-	}
-
-	public void normalize() {
+	private void normalize() {
 		double sum = 0;
 		for (int i = 0; i < values.length; i++) {
 			sum += values[i] * values[i];

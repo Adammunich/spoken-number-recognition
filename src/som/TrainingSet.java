@@ -39,8 +39,8 @@ public class TrainingSet {
 	public Input getRandomInput() {
 		int index = random.nextInt(inputs.length);
 		indices.add(index);
-		System.out.println();
-		System.out.println("input no " + index);
+		// System.out.println();
+		// System.out.println("input no " + index);
 		return inputs[index];
 	}
 
