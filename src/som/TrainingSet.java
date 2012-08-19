@@ -7,10 +7,10 @@ import java.util.Random;
 
 public class TrainingSet {
 
-	private List<Integer> indices = new ArrayList<Integer>(4000);
-	Random r = new Random();
-
+	private static final Random random = new Random();
 	private Input[] inputs;
+
+	private List<Integer> indices = new ArrayList<Integer>(4000);
 
 	public TrainingSet(Input[] inputs) {
 		super();
@@ -31,8 +31,13 @@ public class TrainingSet {
 		System.out.println(indices);
 	}
 
+	public List<Integer> getList() {
+		Collections.reverse(indices);
+		return indices;
+	}
+
 	public Input getRandomInput() {
-		int index = r.nextInt(inputs.length - 1);
+		int index = random.nextInt(inputs.length);
 		indices.add(index);
 		System.out.println();
 		System.out.println("input no " + index);

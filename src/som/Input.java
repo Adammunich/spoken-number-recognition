@@ -21,9 +21,10 @@ public class Input {
 		for (int i = 0; i < values.length; i++) {
 			sum += values[i] * values[i];
 		}
+		sum = Math.sqrt(sum);
 		if (sum != 0) {
 			for (int i = 0; i < values.length; i++) {
-				values[i] /= Math.sqrt(sum);
+				values[i] /= sum;
 			}
 		}
 	}

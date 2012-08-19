@@ -15,6 +15,9 @@ public class SOM {
 	private int numIteration;
 	private int countIteration;
 
+	private double[][] dwt = new double[50 * 13 + 1][50 * 13 + 1];
+	private int windowOffset = 50 / 10;
+
 	private double startRadius;
 
 	public SOM(int numInput, int numOutput) {
@@ -49,9 +52,9 @@ public class SOM {
 			double min = Double.MAX_VALUE;
 			double currentDist = 0;
 			for (int i = 0; i < numOutput; i++) {
-				// System.out.println("dist to " + i + " ");
+				System.out.println("dist to " + i + " ");
 				currentDist = getDistance(weights[i], values);
-				// System.out.println(currentDist);
+				System.out.println(currentDist);
 				if (currentDist < min) {
 					min = currentDist;
 					winner = i;
@@ -78,7 +81,7 @@ public class SOM {
 	private void initWeights() {
 		for (int i = 0; i < numOutput; i++) {
 			for (int j = 0; j < numInput; j++) {
-				weights[i][j] = Math.random() / 1000; // small random number
+				weights[i][j] = Math.random() / 10000; // small random number
 			}
 		}
 	}
@@ -110,17 +113,33 @@ public class SOM {
 	}
 
 	private double getNeighbourhoodRadius() {
-		// return startRadius * Math.exp(-((double) countIteration) /
-		// numIteration);
-		return startRadius * Math.exp(-((double) countIteration) / (numIteration / Math.log(startRadius)));
+		return startRadius * Math.exp(-((double) countIteration) / numIteration);
 	}
 
+	// dynamic time warping
 	private double getDistance(double[] a, double[] b) {
-		double dist = 0;
-		for (int i = 0; i < a.length; i++) {
-			dist += Math.pow(a[i] - b[i], 2);
+		for (int i = 0; i <= a.length; i++) {
+			for (int j = 0; j <= b.length; j++) {
+				dwt[i][j] = Double.MAX_VALUE;
+			}
 		}
-		return Math.sqrt(dist);
+		dwt[0][0] = 0d;
+		int start;
+		int end;
+		for (int i = 1; i <= a.length; i++) {
+			start = Math.max(1, i - windowOffset);
+			end = Math.min(b.length, i + windowOffset);
+			for (int j = start; j <= end; j++) {
+				dwt[i][j] = Math.abs(a[i - 1] - b[i - 1]) + Math.min(dwt[i - 1][j - 1], Math.min(dwt[i - 1][j], dwt[i][j - 1]));
+			}
+		}
+
+		return dwt[a.length][b.length];
+	}
+
+	public List<Integer> getList() {
+		Collections.reverse(indices);
+		return indices;
 	}
 
 	public void printMe() {

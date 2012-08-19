@@ -1,13 +1,17 @@
 package test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import som.Input;
 import som.SOM;
 import som.TrainingSet;
 import dsp.AudioFileUtil;
 import dsp.CMN;
+import dsp.Constants;
 import dsp.DCT;
 import dsp.EndPointDetection;
 import dsp.FFT;
@@ -22,16 +26,16 @@ public class TestRecordMicToFile {
 
 	public static void main(String[] args) {
 
-		Input[] inputs = new Input[10];
+		Input[] inputs = new Input[15];
 		int index = 0;
-		for (int i = 5; i <= 6; i++) {
+		for (int i = 5; i <= 7; i++) {
 			for (int j = 0; j < 5; j++) {
 				// System.out.println(i + "-" + j);
 				// AudioFileUtil.writeFromMicToFile(i + "-" + j + ".wav", 3100);
 				// AudioFileUtil.writeFromMicToFile("test.wav", 3100);
 
 				byte[] signal = AudioFileUtil.readFromFileToByteArray(i + "-" + j + ".wav");
-				List<Frame> frames = Frame.getFramesFromByteArray(signal, 256, 0.5);
+				List<Frame> frames = Frame.getFramesFromByteArray(signal, Constants.FRAME_SAMPLE_LENGTH, 0.5);
 
 				Transformation emphasize = new PreEmphasisFilter();
 				Transformation window = new HammingWindow();
@@ -61,7 +65,7 @@ public class TestRecordMicToFile {
 				Transformation cmn = new CMN(removeStartAndEnd);
 				for (Frame frame : removeStartAndEnd) {
 					frame.applyTransformation(cmn);
-					for (int m = 0; m < 13; m++) {
+					for (int m = 0; m < frame.getBuffer().length; m++) {
 						vals[k * 13 + m] = frame.getBuffer()[m];
 					}
 					k++;
@@ -75,8 +79,24 @@ public class TestRecordMicToFile {
 
 		TrainingSet ts = new TrainingSet(inputs);
 
-		SOM som = new SOM(50 * 13, 2);
-		som.train(ts, 200);
+		SOM som = new SOM(50 * 13, 3);
+		som.train(ts, 5000);
+
+		// ts.printMe();
+		// som.printMe();
+
+		List<Integer> in = ts.getList();
+		List<Integer> out = som.getList();
+		Map<Integer, List<Integer>> res = new HashMap<Integer, List<Integer>>();
+		res.put(0, new ArrayList<Integer>());
+		res.put(1, new ArrayList<Integer>());
+		res.put(2, new ArrayList<Integer>());
+		for (int i = 0; i < out.size(); i++) {
+			res.get(out.get(i)).add(in.get(i));
+		}
+		for (List<Integer> list : res.values()) {
+			System.out.println(list);
+		}
 
 		// ByteArrayOutputStream outtrans = new ByteArrayOutputStream();
 		// int testit = 0;
