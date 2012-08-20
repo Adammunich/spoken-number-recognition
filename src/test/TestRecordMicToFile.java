@@ -1,18 +1,15 @@
 package test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import som.Input;
 import som.SOM;
 import som.TrainingSet;
 import dsp.AudioFileUtil;
-import dsp.CMN;
 import dsp.Constants;
 import dsp.DCT;
+import dsp.DeltaFeatures;
 import dsp.EndPointDetection;
 import dsp.FFT;
 import dsp.Frame;
@@ -21,15 +18,25 @@ import dsp.MelFilter;
 import dsp.PreEmphasisFilter;
 import dsp.SubRange;
 import dsp.Transformation;
+import dsp.WeightedMFCC;
 
 public class TestRecordMicToFile {
 
 	public static void main(String[] args) {
 
-		Input[] inputs = new Input[15];
+		long start = System.currentTimeMillis();
+
+		// for (int i = 7; i <= 7; i++) {
+		// for (int j = 0; j < 2; j++) {
+		// System.out.println("write " + i + " " + j);
+		// AudioFileUtil.writeFromMicToFile(i + "-" + j + ".wav", 3100);
+		// }
+		// }
+
+		Input[] inputs = new Input[30];
 		int index = 0;
 		for (int i = 5; i <= 7; i++) {
-			for (int j = 0; j < 5; j++) {
+			for (int j = 0; j < 10; j++) {
 				// System.out.println(i + "-" + j);
 				// AudioFileUtil.writeFromMicToFile(i + "-" + j + ".wav", 3100);
 				// AudioFileUtil.writeFromMicToFile("test.wav", 3100);
@@ -51,23 +58,20 @@ public class TestRecordMicToFile {
 				// System.out.println(frames.size());
 				// System.out.println(removeStartAndEnd.size());
 
-				Transformation mel = new MelFilter(23);
+				Transformation mel = new MelFilter(Constants.MEL_NUMBER_OF_FILTERS);
 				Transformation dct = new DCT();
-				Transformation sub = new SubRange(1, 14);
+				Transformation sub = new SubRange(1, 1 + Constants.MFCC_LENGTH);
+				Transformation delta = new DeltaFeatures(2);
+				Transformation weight = new WeightedMFCC();
+				double[] vals = new double[50 * Constants.MFCC_LENGTH];
+				int k = 0;
 				for (Frame frame : removeStartAndEnd) {
 					frame.applyTransformation(mel);
 					frame.applyTransformation(dct);
 					frame.applyTransformation(sub);
-				}
-
-				double[] vals = new double[50 * 13];
-				int k = 0;
-				Transformation cmn = new CMN(removeStartAndEnd);
-				for (Frame frame : removeStartAndEnd) {
-					frame.applyTransformation(cmn);
-					for (int m = 0; m < frame.getBuffer().length; m++) {
-						vals[k * 13 + m] = frame.getBuffer()[m];
-					}
+					frame.applyTransformation(delta);
+					frame.applyTransformation(weight);
+					System.arraycopy(frame.getBuffer(), 0, vals, k * Constants.MFCC_LENGTH, Constants.MFCC_LENGTH);
 					k++;
 				}
 
@@ -79,24 +83,11 @@ public class TestRecordMicToFile {
 
 		TrainingSet ts = new TrainingSet(inputs);
 
-		SOM som = new SOM(50 * 13, 3);
-		som.train(ts, 5000);
-
-		// ts.printMe();
-		// som.printMe();
-
-		List<Integer> in = ts.getList();
-		List<Integer> out = som.getList();
-		Map<Integer, List<Integer>> res = new HashMap<Integer, List<Integer>>();
-		res.put(0, new ArrayList<Integer>());
-		res.put(1, new ArrayList<Integer>());
-		res.put(2, new ArrayList<Integer>());
-		for (int i = 0; i < out.size(); i++) {
-			res.get(out.get(i)).add(in.get(i));
-		}
-		for (List<Integer> list : res.values()) {
-			System.out.println(list);
-		}
+		SOM som = new SOM(Constants.NUMBER_OF_SOM_INPUTS, Constants.NUMBER_OF_SOM_OUTPUTS);
+		som.train(ts, 2500);
+		som.getStats().print();
+		som.getStats().printAggregated(10, 100);
+		som.getStats().printCoverage(10, 100);
 
 		// ByteArrayOutputStream outtrans = new ByteArrayOutputStream();
 		// int testit = 0;
@@ -110,5 +101,7 @@ public class TestRecordMicToFile {
 		//
 		// AudioFileUtil.writeFromByteArrayToFile("test1.wav",
 		// outtrans.toByteArray());
+
+		System.out.println("Time: " + (System.currentTimeMillis() - start));
 	}
 }

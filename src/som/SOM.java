@@ -1,35 +1,35 @@
 package som;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Random;
+
+import dsp.Constants;
 
 public class SOM {
 
-	private List<Integer> indices = new ArrayList<Integer>(4000);
+	private static final Random RANDOM = new Random();
 
 	private int numInput;
 	private int numOutput;
+	private double startRadius;
+	private double[][] dwt;
 	private double[][] weights;
-	private double startLearningRate = 0.1;
 	private int numIteration;
 	private int countIteration;
 
-	private double[][] dwt = new double[50 * 13 + 1][50 * 13 + 1];
-	private int windowOffset = 50 / 10;
-
-	private double startRadius;
+	private Statistics stats;
 
 	public SOM(int numInput, int numOutput) {
 		this.numInput = numInput;
 		this.numOutput = numOutput;
 		this.startRadius = numOutput / 2;
+		this.dwt = new double[numInput + 1][numInput + 1];
 		this.weights = new double[numOutput][numInput];
 		for (int i = 0; i < numOutput; i++) {
 			for (int j = 0; j < numInput; j++) {
-				weights[i][j] = Math.random() / 10000; // small random number
+				weights[i][j] = RANDOM.nextDouble() / 10000; // small random
 			}
 		}
+		this.stats = new Statistics(numOutput);
 	}
 
 	public void train(TrainingSet ts, int numIteration) {
@@ -64,13 +64,13 @@ public class SOM {
 	}
 
 	private boolean epoch(TrainingSet ts) {
-		Input input = ts.getRandomInput();
+		int index = RANDOM.nextInt(ts.getInputs().length);
+		Input input = ts.getInputs()[index];
 		if (input.getValues().length != numInput) {
 			return false;
 		} else {
 			int winner = findWinner(input);
-			indices.add(winner);
-			// System.out.println("winner " + winner);
+			stats.add(index, winner);
 			adjustWeights(input, winner);
 			return true;
 		}
@@ -103,7 +103,7 @@ public class SOM {
 	}
 
 	private double getLearningRate() {
-		return startLearningRate * Math.exp(-((double) countIteration) / numIteration);
+		return Constants.START_LEARNING_RATE * Math.exp(-((double) countIteration) / numIteration);
 	}
 
 	// dynamic time warping
@@ -117,8 +117,8 @@ public class SOM {
 		int start;
 		int end;
 		for (int i = 1; i <= a.length; i++) {
-			start = Math.max(1, i - windowOffset);
-			end = Math.min(b.length, i + windowOffset);
+			start = Math.max(1, i - Constants.DWT_WINDOW_OFFSET);
+			end = Math.min(b.length, i + Constants.DWT_WINDOW_OFFSET);
 			for (int j = start; j <= end; j++) {
 				dwt[i][j] = Math.abs(a[i - 1] - b[i - 1]) + Math.min(dwt[i - 1][j - 1], Math.min(dwt[i - 1][j], dwt[i][j - 1]));
 			}
@@ -127,31 +127,8 @@ public class SOM {
 		return dwt[a.length][b.length];
 	}
 
-	public List<Integer> getList() {
-		Collections.reverse(indices);
-		return indices;
-	}
-
-	public void printMe() {
-		Collections.reverse(indices);
-		System.out.print("Output ");
-		System.out.println(indices);
-	}
-
-	public int getNumInput() {
-		return numInput;
-	}
-
-	public void setNumInput(int numInput) {
-		this.numInput = numInput;
-	}
-
-	public int getNumOutput() {
-		return numOutput;
-	}
-
-	public void setNumOutput(int numOutput) {
-		this.numOutput = numOutput;
+	public Statistics getStats() {
+		return stats;
 	}
 
 }

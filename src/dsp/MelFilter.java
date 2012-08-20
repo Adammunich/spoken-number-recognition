@@ -16,14 +16,13 @@ public class MelFilter implements Transformation {
 	}
 
 	private void calculateCentersOfFrequency() {
-		double delta = (fromHzToMel(Constants.MAX_FREQUENCY) - fromHzToMel(Constants.MIN_FREQUENCY)) / (numberOfTriangularFilters + 1);
+		double delta = (fromHzToMel(Constants.MEL_MAX_FREQUENCY) - fromHzToMel(Constants.MEL_MIN_FREQUENCY)) / (numberOfTriangularFilters + 1);
 		centerOfFrequency = new double[numberOfTriangularFilters + 2];
-		centerOfFrequency[0] = Constants.MIN_FREQUENCY;
+		centerOfFrequency[0] = Constants.MEL_MIN_FREQUENCY;
 		for (int i = 1; i <= numberOfTriangularFilters; i++) {
 			centerOfFrequency[i] = fromMelToHz(delta * i);
-			// System.out.println(centerOfFrequency[i]);
 		}
-		centerOfFrequency[numberOfTriangularFilters + 1] = Constants.MAX_FREQUENCY;
+		centerOfFrequency[numberOfTriangularFilters + 1] = Constants.MEL_MAX_FREQUENCY;
 	}
 
 	private static double fromMelToHz(double mels) {

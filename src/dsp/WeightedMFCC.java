@@ -6,21 +6,17 @@ package dsp;
  */
 public class WeightedMFCC implements Transformation {
 
-	private final double p = 1d / 3d;
-	private final double q = 1d / 6d;
-
 	public WeightedMFCC() {
 		super();
 	}
 
 	@Override
 	public double[] transform(double[] input) {
-		int mfccLength = input.length / 3;
-		double[] result = new double[mfccLength];
+		double[] result = new double[Constants.MFCC_LENGTH];
 		for (int i = 0; i < result.length; i++) {
 			result[i] = input[i];
-			result[i] += p * input[i + mfccLength];
-			result[i] += q * input[i + mfccLength + mfccLength];
+			result[i] += Constants.MFCC_WIGHT_FACTOR_P * input[i + Constants.MFCC_LENGTH];
+			result[i] += Constants.MFCC_WIGHT_FACTOR_Q * input[i + 2 * Constants.MFCC_LENGTH];
 		}
 		return result;
 	}
