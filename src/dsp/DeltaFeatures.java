@@ -15,7 +15,7 @@ public class DeltaFeatures implements Transformation {
 		for (int i = 1; i <= depth; i++) {
 			inverseSquareSum += i * i;
 		}
-		inverseSquareSum = 1 / inverseSquareSum;
+		inverseSquareSum = 1 / inverseSquareSum;// *2?
 	}
 
 	@Override

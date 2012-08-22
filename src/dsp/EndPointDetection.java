@@ -38,14 +38,18 @@ public class EndPointDetection {
 		// total energy
 		double totalSpectralEnergy = 0d;
 		for (int i = 0; i < frame.getBuffer().length / 2; i++) {
-			if (i * Constants.FREQUENCY_STEP > 350 && i * Constants.FREQUENCY_STEP < 3750) {
-				totalSpectralEnergy += frame.getBuffer()[i];
-			}
+			// if (i * Constants.FREQUENCY_STEP > 350 && i *
+			// Constants.FREQUENCY_STEP < 3750) {
+			totalSpectralEnergy += frame.getBuffer()[i];
+			// }
 		}
 		// probability
 		double[] probabilityDensity = new double[frame.getBuffer().length / 2];
 		for (int i = 0; i < probabilityDensity.length; i++) {
-			if (totalSpectralEnergy < 1e-9 || (i * Constants.FREQUENCY_STEP <= 350 || i * Constants.FREQUENCY_STEP >= 3750)) {
+			if (Math.abs(totalSpectralEnergy) < Constants.EPS)
+			// || (i * Constants. FREQUENCY_STEP <= 350 || i *
+			// Constants.FREQUENCY_STEP >= 3750))
+			{
 				probabilityDensity[i] = 0d;
 			} else {
 				probabilityDensity[i] = frame.getBuffer()[i] / totalSpectralEnergy;
@@ -54,7 +58,7 @@ public class EndPointDetection {
 		// entropy
 		double spectralEntropy = 0d;
 		for (int i = 0; i < probabilityDensity.length; i++) {
-			if (probabilityDensity[i] > 1e-9) {
+			if (probabilityDensity[i] > Constants.EPS) {
 				spectralEntropy += probabilityDensity[i] * Math.log(probabilityDensity[i]);
 			}
 		}

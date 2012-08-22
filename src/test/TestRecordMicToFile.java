@@ -63,7 +63,7 @@ public class TestRecordMicToFile {
 				Transformation sub = new SubRange(1, 1 + Constants.MFCC_LENGTH);
 				Transformation delta = new DeltaFeatures(2);
 				Transformation weight = new WeightedMFCC();
-				double[] vals = new double[50 * Constants.MFCC_LENGTH];
+				double[] vals = new double[removeStartAndEnd.size() * Constants.MFCC_LENGTH];
 				int k = 0;
 				for (Frame frame : removeStartAndEnd) {
 					frame.applyTransformation(mel);
@@ -76,15 +76,17 @@ public class TestRecordMicToFile {
 				}
 
 				inputs[index] = new Input(vals);
+				// System.out.println(index);
 				System.out.println(Arrays.toString(vals));
 				index++;
 			}
+			System.out.println();
 		}
 
 		TrainingSet ts = new TrainingSet(inputs);
 
 		SOM som = new SOM(Constants.NUMBER_OF_SOM_INPUTS, Constants.NUMBER_OF_SOM_OUTPUTS);
-		som.train(ts, 2500);
+		som.train(ts, 5000);
 		som.getStats().print();
 		som.getStats().printAggregated(10, 100);
 		som.getStats().printCoverage(10, 100);
