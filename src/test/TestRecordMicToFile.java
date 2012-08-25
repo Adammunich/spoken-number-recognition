@@ -1,5 +1,6 @@
 package test;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import dsp.AudioFileUtil;
 import dsp.Constants;
 import dsp.DCT;
 import dsp.DeltaFeatures;
-import dsp.EndPointDetection;
+import dsp.EnergyEndPointDetection;
 import dsp.FFT;
 import dsp.Frame;
 import dsp.HammingWindow;
@@ -26,8 +27,8 @@ public class TestRecordMicToFile {
 
 		long start = System.currentTimeMillis();
 
-		// for (int i = 7; i <= 7; i++) {
-		// for (int j = 0; j < 2; j++) {
+		// for (int i = 6; i <= 6; i++) {
+		// for (int j = 7; j < 8; j++) {
 		// System.out.println("write " + i + " " + j);
 		// AudioFileUtil.writeFromMicToFile(i + "-" + j + ".wav", 3100);
 		// }
@@ -53,10 +54,10 @@ public class TestRecordMicToFile {
 					frame.applyTransformation(dft);
 				}
 
-				EndPointDetection endPointDetection = new EndPointDetection(frames);
+				EnergyEndPointDetection endPointDetection = new EnergyEndPointDetection(frames);
 				List<Frame> removeStartAndEnd = endPointDetection.removeStartAndEnd();
 				// System.out.println(frames.size());
-				// System.out.println(removeStartAndEnd.size());
+				System.out.println(removeStartAndEnd.size());
 
 				Transformation mel = new MelFilter(Constants.MEL_NUMBER_OF_FILTERS);
 				Transformation dct = new DCT();
@@ -86,24 +87,25 @@ public class TestRecordMicToFile {
 		TrainingSet ts = new TrainingSet(inputs);
 
 		SOM som = new SOM(Constants.NUMBER_OF_SOM_INPUTS, Constants.NUMBER_OF_SOM_OUTPUTS);
-		som.train(ts, 5000);
+		som.train(ts, 3000);
 		som.getStats().print();
 		som.getStats().printAggregated(10, 100);
 		som.getStats().printCoverage(10, 100);
 
-		// ByteArrayOutputStream outtrans = new ByteArrayOutputStream();
-		// int testit = 0;
-		// for (Frame frame : removeStartAndEnd) {
-		// if (testit % 2 == 0) {
-		// outtrans.write(frame.getOriginalBuffer(), 0,
-		// frame.getOriginalBuffer().length);
-		// }
-		// testit++;
-		// }
-		//
-		// AudioFileUtil.writeFromByteArrayToFile("test1.wav",
-		// outtrans.toByteArray());
-
 		System.out.println("Time: " + (System.currentTimeMillis() - start));
 	}
+
+	public static void windowedFramesToFile(List<Frame> frames, int index) {
+		ByteArrayOutputStream outtrans = new ByteArrayOutputStream();
+		int testit = 0;
+		for (Frame frame : frames) {
+			if (testit % 2 == 0) {
+				outtrans.write(frame.getOriginalBuffer(), 0, frame.getOriginalBuffer().length);
+			}
+			testit++;
+		}
+
+		AudioFileUtil.writeFromByteArrayToFile("test" + index + ".wav", outtrans.toByteArray());
+	}
+
 }

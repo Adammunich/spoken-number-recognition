@@ -11,7 +11,6 @@ public class SOM {
 
 	private static final Random RANDOM = new Random();
 
-	// private int numInput;
 	private int numOutput;
 	private double startRadius;
 	private double[][] dwt;
@@ -22,26 +21,18 @@ public class SOM {
 	private Statistics stats;
 
 	public SOM(int numInput, int numOutput) {
-		// this.numInput = numInput;
+		super();
 		this.numOutput = numOutput;
 		this.startRadius = numOutput / 2;
 		this.dwt = new double[numInput + 1][numInput + 1];
 		this.weights = new double[numOutput][numInput];
-		// for (int i = 0; i < numOutput; i++) {
-		// for (int j = 0; j < numInput; j++) {
-		// weights[i][j] = RANDOM.nextDouble() / 10000; // small random
-		// }
-		// }
 		this.stats = new Statistics(numOutput);
 	}
 
 	public void train(TrainingSet ts, int numIteration) {
 		this.numIteration = numIteration;
-		this.countIteration = 0;
-		boolean ok = true;
-		while (countIteration <= numIteration && ok) {
-			countIteration++;
-			ok = epoch(ts);
+		for (countIteration = 0; countIteration < numIteration; countIteration++) {
+			epoch(ts);
 		}
 	}
 
@@ -51,7 +42,6 @@ public class SOM {
 		double min = Double.MAX_VALUE;
 		double currentDist = 0;
 		for (int i = 0; i < numOutput; i++) {
-			// System.out.println("dist to " + i + " ");
 
 			// if (weights[i] == null) {
 			// currentDist = getDistance(new double[values.length], values);
@@ -59,7 +49,6 @@ public class SOM {
 			currentDist = getDistance(weights[i], values);
 			// }
 
-			// System.out.println(currentDist);
 			if (currentDist < min) {
 				min = currentDist;
 				winner = i;
@@ -68,19 +57,16 @@ public class SOM {
 		return winner;
 	}
 
-	private boolean epoch(TrainingSet ts) {
+	private void epoch(TrainingSet ts) {
 		int index = RANDOM.nextInt(ts.getInputs().length);
 		Input input = ts.getInputs()[index];
 		int winner = findWinner(input);
 		stats.add(index, winner);
 		adjustWeights(input, winner);
-		return true;
 	}
 
 	private void adjustWeights(Input input, int winner) {
 		double[] values = input.getValues();
-		// System.out.println("learning rage " + getLearningRate());
-		// System.out.println("neighbourhood rage " + getNeighbourhoodRadius());
 		for (int i = 0; i < numOutput; i++) {
 			double radius = getNeighbourhoodRadius();
 			int distance = Math.abs(winner - i);
@@ -89,32 +75,67 @@ public class SOM {
 			}
 			// System.out.println("distance factor " + winner + " to " + i + " "
 			// + getDistanceFactor(distance, radius));
-			// for (int j = 0; j < values.length; j++) {
-			// weights[i][j] += getDistanceFactor(distance, radius) *
-			// getLearningRate() * (values[j] - weights[i][j]);
-			// }
+
 			// if (weights[i] == null) {
 			// weights[i] = new double[values.length];
 			// }
+			double factor = getDistanceFactor(distance, radius) * getLearningRate();
+
+			// if (values.length > weights[i].length) {
+			// weights[i] = Arrays.copyOf(weights[i], (int)
+			// Math.round(weights[i].length + factor * (values.length -
+			// weights[i].length)));
+			// }
+
 			List<WarpPair> path = getWarpPath(weights[i], values, true);
 
-			// if (path.size() > weights[i].length) {
-			// System.out.println("path " + path.size());
-			// weights[i] = Arrays.copyOf(weights[i], path.size());
-			// }
-			//
-			// int k = 0;
-			// for (WarpPair warpPair : path) {
-			// weights[i][k] += getDistanceFactor(distance, radius) *
-			// getLearningRate() * (values[warpPair.getJ()] - weights[i][k]);
-			// k++;
-			// }
 			for (WarpPair warpPair : path) {
-				weights[i][warpPair.getI()] += getDistanceFactor(distance, radius) * getLearningRate()
-						* (values[warpPair.getJ()] - weights[i][warpPair.getI()]);
+				weights[i][warpPair.getI()] += factor * (values[warpPair.getJ()] - weights[i][warpPair.getI()]);
 			}
+
 		}
 	}
+
+	// public double[] adjuster(double[] a, double[] b, double factor) {
+	// double[] newWights = new double[(int) Math.round(a.length + factor *
+	// (b.length - a.length))];
+	//
+	// List<WarpPair> path = getWarpPath(a, b, true);
+	//
+	// for (int j = 0; j < newWights.length; j++) {
+	// for (int k = 0; k < path.size(); k++) {
+	// WarpPair warpPair = path.get(k);
+	// double pairIndex = warpPair.getI() + factor * (warpPair.getJ() -
+	// warpPair.getI());
+	//
+	// if (Math.abs(pairIndex - j) < Constants.EPS) {
+	// newWights[j] = a[warpPair.getI()] + factor * (b[warpPair.getJ()] -
+	// a[warpPair.getI()]);
+	// break;
+	// } else if (k < path.size() - 1) {
+	//
+	// WarpPair warpPairNext = path.get(k + 1);
+	// double pairIndexNext = warpPairNext.getI() + factor *
+	// (warpPairNext.getJ() - warpPairNext.getI());
+	//
+	// if (pairIndex < j && j < pairIndexNext) {
+	// double m1 = a[warpPair.getI()] + factor * (b[warpPair.getJ()] -
+	// a[warpPair.getI()]);
+	// double m2 = a[warpPairNext.getI()] + factor * (b[warpPairNext.getJ()] -
+	// a[warpPairNext.getI()]);
+	// double q1 = pairIndexNext - j;
+	// double q2 = j - pairIndex;
+	//
+	// newWights[j] = (q1 * m1 + q2 * m2) / (q1 + q2);
+	// break;
+	// }
+	//
+	// }
+	// }
+	// }
+	//
+	// return newWights;
+	// }
 
 	private double getDistanceFactor(double distance, double neighbourhoodRadius) {
 		return Math.exp(-distance * distance / (2 * neighbourhoodRadius * neighbourhoodRadius));
@@ -131,10 +152,8 @@ public class SOM {
 	// dynamic time warping
 	public double getDistance(double[] a, double[] b) {
 
-		int dwtWindowOffset = Math.max(a.length, b.length) / Constants.DWT_WINDOW_FACTOR;
+		int dwtWindowOffset = Math.max(a.length, b.length) / Constants.DTW_WINDOW_FACTOR;
 		dwtWindowOffset = Math.max(dwtWindowOffset, Math.abs(a.length - b.length));
-		// System.out.println("offset " + dwtWindowOffset);
-		// dwtWindowOffset = 5;
 
 		for (int i = 0; i <= a.length; i++) {
 			for (int j = 0; j <= b.length; j++) {
@@ -152,17 +171,9 @@ public class SOM {
 			}
 		}
 
-		// for (int i = 0; i < dwt.length; i++) {
-		// for (int j = 0; j < dwt.length; j++) {
-		// System.out.print(dwt[i][j] + "   ");
-		// }
-		// System.out.println();
-		// }
-
 		return dwt[a.length][b.length] / getWarpPath(a, b, false).size();
 	}
 
-	// TODO?
 	public List<WarpPair> getWarpPath(double[] a, double[] b, boolean calcDist) {
 		if (calcDist) {
 			getDistance(a, b);
@@ -214,11 +225,5 @@ public class SOM {
 		}
 
 	}
-
-	// public static void main(String[] arg) {
-	// SOM som = new SOM(5, 5);
-	// System.out.println(som.getWarpPath(new double[] { 2, 2, 3, 2, 2 }, new
-	// double[] { 2, 1, 2 }));
-	// }
 
 }

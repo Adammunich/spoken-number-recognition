@@ -28,7 +28,7 @@ public final class Constants {
 	public static final int NUMBER_OF_SOM_INPUTS = 50 * MFCC_LENGTH;;
 	public static final int NUMBER_OF_SOM_OUTPUTS = 3;
 
-	public static final int DWT_WINDOW_FACTOR = 10;
+	public static final int DTW_WINDOW_FACTOR = 10;
 
 	private Constants() {
 	}
