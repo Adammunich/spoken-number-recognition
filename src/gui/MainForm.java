@@ -1,9 +1,7 @@
 package gui;
 
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Toolkit;
 import java.io.File;
 
 import javax.swing.BorderFactory;
@@ -11,7 +9,6 @@ import javax.swing.DefaultListModel;
 import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -24,7 +21,13 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import net.miginfocom.swing.MigLayout;
 
+/**
+ * @author igorletso
+ * 
+ */
 public class MainForm extends JApplet {
+
+	private static final long serialVersionUID = -3838320390904637165L;
 
 	void setLAF() {
 		String laf = UIManager.getSystemLookAndFeelClassName();
@@ -117,26 +120,6 @@ public class MainForm extends JApplet {
 
 		ProgressBarListener pbl = new ProgressBarListener(progressBar);
 		progressBar.addChangeListener(pbl);
-	}
-
-	private static void centerWindow(JFrame frame) {
-		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-		int x = (int) ((dimension.getWidth() - frame.getWidth()) / 2);
-		int y = (int) ((dimension.getHeight() - frame.getHeight()) / 2);
-		frame.setLocation(x, y);
-	}
-
-	public static void main(String[] args) {
-		JFrame frame = new JFrame("Spoken digits recognition");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLocationRelativeTo(null);
-		JApplet applet = new MainForm();
-		applet.init();
-		frame.getContentPane().add(applet);
-		frame.setSize(780, 500);
-		centerWindow(frame);
-		frame.setVisible(true);
-
 	}
 
 }

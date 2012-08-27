@@ -21,13 +21,14 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 class AproveOpenFolder implements ActionListener {
+
+	private JFileChooser openFolderDialog;
+	private JList<File> fileList;
+
 	public AproveOpenFolder(JFileChooser openFolderDialog, JList<File> fileList) {
 		this.openFolderDialog = openFolderDialog;
 		this.fileList = fileList;
 	}
-
-	private JFileChooser openFolderDialog;
-	private JList<File> fileList;
 
 	@Override
 	public void actionPerformed(ActionEvent evt) {

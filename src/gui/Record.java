@@ -11,6 +11,10 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.TargetDataLine;
 import javax.swing.SwingWorker;
 
+/**
+ * @author igorletso
+ * 
+ */
 public class Record extends SwingWorker<Void, Void> {
 
 	@Override
