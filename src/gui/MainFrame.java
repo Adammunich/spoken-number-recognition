@@ -1,14 +1,25 @@
 package gui;
 
+import gui.listeners.AproveOpenFolder;
+import gui.listeners.LoadFromFileListener;
+import gui.listeners.ProgressBarListener;
+import gui.listeners.RecordListener;
+import gui.listeners.RemoveFileListener;
+import gui.listeners.SaveToFileListener;
+
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
-import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -25,25 +36,43 @@ import net.miginfocom.swing.MigLayout;
  * @author igorletso
  * 
  */
-public class MainForm extends JApplet {
+public abstract class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = -3838320390904637165L;
 
+	public MainFrame() {
+		super("Spoken digits recognition");
+		initFrame();
+		setPosition();
+		setLAF();
+		initComponents();
+	}
+
+	private void initFrame() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
+		setSize(780, 500);
+	}
+
+	private void setPosition() {
+		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+		int x = (int) ((dimension.getWidth() - getWidth()) / 2);
+		int y = (int) ((dimension.getHeight() - getHeight()) / 2);
+		setLocation(x, y);
+	}
+
 	void setLAF() {
-		String laf = UIManager.getSystemLookAndFeelClassName();
 		try {
-			UIManager.setLookAndFeel(laf);
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (UnsupportedLookAndFeelException e) {
-			JOptionPane.showOptionDialog(null, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, "OK");
+			JOptionPane.showOptionDialog(this, e.getMessage(), "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, "OK");
 		} catch (Exception e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 		}
 
 	}
 
-	@Override
-	public void init() {
-		setLAF();
+	public void initComponents() {
 		JPanel p = new JPanel(new MigLayout());
 
 		JPanel up = new JPanel(new MigLayout());
@@ -62,7 +91,7 @@ public class MainForm extends JApplet {
 		recDig.setFont(labelFont);
 		digit.setFont(labelFont);
 
-		JButton record = new JButton("Record");
+		JButton recordButton = new JButton("Record");
 		JButton openFile = new JButton("Open from file");
 		JButton recognize = new JButton("Recognize");
 		JProgressBar progressBar = new JProgressBar(0, 101);
@@ -85,7 +114,7 @@ public class MainForm extends JApplet {
 		cp.add(p);
 
 		up.setBorder(BorderFactory.createTitledBorder("Training"));
-		up.add(fileList, "span 1 5, height 200:200:200, width 300:300:300");
+		up.add(fileList, "span 1 5, height 200:200:200, width 500:500:500");
 		up.add(openFolder, "wrap");
 		up.add(removeFile, "wrap");
 		up.add(saveData, "wrap");
@@ -93,7 +122,7 @@ public class MainForm extends JApplet {
 		up.add(startTraining);
 
 		down.setBorder(BorderFactory.createTitledBorder("Recognition"));
-		down.add(record, "align center");
+		down.add(recordButton, "align center");
 		down.add(openFile, "split 2");
 		down.add(recognize, "wrap");
 		down.add(progressBar, "wrap 15px");
@@ -103,23 +132,34 @@ public class MainForm extends JApplet {
 		p.add(up, "span, height 250:250:250, width 750:750:750");
 		p.add(down, "span, height 130:130:130, width 750:750:750");
 
-		AproveOpenFolder aof = new AproveOpenFolder(openFolderDialog, fileList);
-		openFolder.addActionListener(aof);
+		openFolder.addActionListener(new AproveOpenFolder(openFolderDialog, fileList));
 
-		RemoveFileListener rfl = new RemoveFileListener(fileList);
-		removeFile.addActionListener(rfl);
+		removeFile.addActionListener(new RemoveFileListener(fileList));
 
-		SaveToFileListener sfl = new SaveToFileListener(fileList, saveFileDialog);
-		saveData.addActionListener(sfl);
+		saveData.addActionListener(new SaveToFileListener(fileList, saveFileDialog));
 
-		LoadFromFileListener lffl = new LoadFromFileListener(fileList, loadFileDialog);
-		loadData.addActionListener(lffl);
+		loadData.addActionListener(new LoadFromFileListener(fileList, loadFileDialog));
 
-		RecordListener rl = new RecordListener(progressBar);
-		record.addActionListener(rl);
+		final RecordListener recordListener = new RecordListener(progressBar);
+		recordButton.addActionListener(recordListener);
 
-		ProgressBarListener pbl = new ProgressBarListener(progressBar);
-		progressBar.addChangeListener(pbl);
+		progressBar.addChangeListener(new ProgressBarListener(progressBar));
+
+		recognize.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				byte[] recording = recordListener.getRecording();
+				if (recording == null) {
+					JOptionPane.showMessageDialog(MainFrame.this, "Nothing is recorded.", "Error", JOptionPane.ERROR_MESSAGE);
+				} else {
+					recognize(recording);
+				}
+			}
+
+		});
 	}
+
+	protected abstract void recognize(byte[] record);
 
 }

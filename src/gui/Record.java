@@ -1,63 +1,59 @@
 package gui;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 import javax.swing.SwingWorker;
 
+import main.Constants;
+
 /**
  * @author igorletso
+ * @author niktrk
  * 
  */
-public class Record extends SwingWorker<Void, Void> {
+public class Record extends SwingWorker<byte[], Byte> {
+
+	private static final int RECORD_LENGTH = 3000;
+	private static final int RECORD_STEP = RECORD_LENGTH / 100;
 
 	@Override
-	protected Void doInBackground() throws Exception {
-		AudioFormat format = new AudioFormat(8000, 8, 1, true, false);
-		TargetDataLine dataLine = AudioSystem.getTargetDataLine(format);
-		dataLine.open(format);
-		dataLine.start();
+	protected byte[] doInBackground() throws Exception {
+		TargetDataLine dataLine = null;
+		try {
+			dataLine = AudioSystem.getTargetDataLine(Constants.AUDIO_FORMAT);
+			dataLine.open(Constants.AUDIO_FORMAT);
+			dataLine.start();
+		} catch (LineUnavailableException e) {
+			e.printStackTrace();
+		}
 
-		int bufferSize = (int) (format.getFrameSize() * format.getFrameRate());
+		int bufferSize = (int) (Constants.AUDIO_FORMAT.getFrameSize() * Constants.AUDIO_FORMAT.getFrameRate());
 		byte[] buffer = new byte[bufferSize];
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
 		long start = System.currentTimeMillis();
-		int progress = (int) (System.currentTimeMillis() - start);
+		int progress = 0;
 		setProgress(0);
-		while (progress < 5000) {
+		while (progress < RECORD_LENGTH) {
 			int count = dataLine.read(buffer, 0, bufferSize);
 			if (count > 0) {
 				out.write(buffer, 0, count);
 			}
 			progress = (int) (System.currentTimeMillis() - start);
-			setProgress(progress / 51);
+			setProgress(Math.min(RECORD_LENGTH, progress) / RECORD_STEP);
 		}
 		dataLine.drain();
 		dataLine.close();
-
-		byte[] outArray = out.toByteArray();
-
-		AudioInputStream audioInput = new AudioInputStream(new ByteArrayInputStream(outArray), format, outArray.length / format.getFrameSize());
-
-		if (AudioSystem.isFileTypeSupported(AudioFileFormat.Type.WAVE, audioInput)) {
-			AudioSystem.write(audioInput, AudioFileFormat.Type.WAVE, new File("test.wav"));
-		}
-		audioInput = AudioSystem.getAudioInputStream(new File("test.wav"));
 		setProgress(100);
-		return null;
+		return out.toByteArray();
 	}
 
 	@Override
 	public void done() {
 		setProgress(100);
-
 	}
 
 }
