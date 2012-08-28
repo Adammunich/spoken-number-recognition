@@ -17,10 +17,12 @@ public class RemoveFileListener implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		int index = fileList.getSelectedIndex();
-		if (index > -1) {
+		int indices[] = fileList.getSelectedIndices();
+		int count = 0;
+		for (int i = 0; i < indices.length; i++) {
 			DefaultListModel<File> dlm = (DefaultListModel<File>) fileList.getModel();
-			dlm.remove(index);
+			dlm.remove(indices[i] - count);
+			count++;
 		}
 	}
 }

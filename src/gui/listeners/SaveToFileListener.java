@@ -26,12 +26,14 @@ public class SaveToFileListener implements ActionListener {
 		try {
 			DefaultListModel<File> lm = (DefaultListModel<File>) fileList.getModel();
 			dialog.showSaveDialog(dialog.getParent());
-			BufferedWriter output = new BufferedWriter(new FileWriter(dialog.getSelectedFile()));
-			for (int i = 0; i < lm.size(); i++) {
-				output.write(lm.getElementAt(i).toString());
-				output.newLine();
+			if (dialog.getSelectedFile() != null) {
+				BufferedWriter output = new BufferedWriter(new FileWriter(dialog.getSelectedFile()));
+				for (int i = 0; i < lm.size(); i++) {
+					output.write(lm.getElementAt(i).toString());
+					output.newLine();
+				}
+				output.close();
 			}
-			output.close();
 		} catch (IOException e) {
 		}
 

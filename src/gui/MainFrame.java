@@ -13,6 +13,7 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.io.File;
 
 import javax.swing.BorderFactory;
@@ -27,6 +28,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -80,7 +82,17 @@ public abstract class MainFrame extends JFrame {
 		JPanel up = new JPanel(new MigLayout());
 		JPanel down = new JPanel(new MigLayout());
 		DefaultListModel<File> model = new DefaultListModel<File>();
-		JList<File> fileList = new JList<File>(model);
+		JList<File> fileList = new JList<File>(model) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public String getToolTipText(MouseEvent evt) {
+				int index = locationToIndex(evt.getPoint());
+				File item = getModel().getElementAt(index);
+				return item.toString();
+			}
+		};
+		JScrollPane fileListScrollPane = new JScrollPane(fileList);
 		JButton openFolder = new JButton("Find training data");
 		JButton removeFile = new JButton("Remove file");
 		JButton saveData = new JButton("Save training data to file");
@@ -116,7 +128,7 @@ public abstract class MainFrame extends JFrame {
 		cp.add(p);
 
 		up.setBorder(BorderFactory.createTitledBorder("Training"));
-		up.add(fileList, "span 1 5, height 200:200:200, width 500:500:500");
+		up.add(fileListScrollPane, "span 1 5, height 200:200:200, width 500:500:500");
 		up.add(openFolder, "wrap");
 		up.add(removeFile, "wrap");
 		up.add(saveData, "wrap");

@@ -27,16 +27,18 @@ public class LoadFromFileListener implements ActionListener {
 		try {
 			DefaultListModel<File> lm = (DefaultListModel<File>) fileList.getModel();
 			dialog.showOpenDialog(dialog.getParent());
-			BufferedReader input = new BufferedReader(new FileReader(dialog.getSelectedFile()));
-			String line = "";
-			lm.clear();
-			while (line != null) {
-				line = input.readLine();
-				if (line != null) {
-					try {
-						lm.addElement(new File(line));
-					} catch (NullPointerException e1) {
-						JOptionPane.showMessageDialog(null, "File " + line + " doesn't exist.");
+			if (dialog.getSelectedFile() != null) {
+				BufferedReader input = new BufferedReader(new FileReader(dialog.getSelectedFile()));
+				String line = "";
+				lm.clear();
+				while (line != null) {
+					line = input.readLine();
+					if (line != null) {
+						try {
+							lm.addElement(new File(line));
+						} catch (NullPointerException e1) {
+							JOptionPane.showMessageDialog(null, "File " + line + " doesn't exist.");
+						}
 					}
 				}
 			}
