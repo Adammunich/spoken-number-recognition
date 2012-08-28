@@ -1,6 +1,6 @@
 package dsp.transformation;
 
-import dsp.Constants;
+import main.Constants;
 
 /**
  * @author niktrk
@@ -8,8 +8,8 @@ import dsp.Constants;
  */
 public class MelFilter implements Transformation {
 
-	private static final int MEL_MIN_FREQUENCY = 200;// 0-350
-	private static final int MEL_MAX_FREQUENCY = 3500;// 3500-4000
+	private static final int MEL_MIN_FREQUENCY = 0;// 0-350
+	private static final int MEL_MAX_FREQUENCY = 4000;// 3500-4000
 
 	private int numberOfTriangularFilters;
 	private double[] centerOfFrequency;
@@ -25,7 +25,7 @@ public class MelFilter implements Transformation {
 		centerOfFrequency = new double[numberOfTriangularFilters + 2];
 		centerOfFrequency[0] = MEL_MIN_FREQUENCY;
 		for (int i = 1; i <= numberOfTriangularFilters; i++) {
-			centerOfFrequency[i] = fromMelToHz(delta * i);
+			centerOfFrequency[i] = fromMelToHz(delta * i + fromHzToMel(MEL_MIN_FREQUENCY));
 		}
 		centerOfFrequency[numberOfTriangularFilters + 1] = MEL_MAX_FREQUENCY;
 	}
