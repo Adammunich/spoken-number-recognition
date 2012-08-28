@@ -8,7 +8,6 @@ import som.dtw.DTW;
 import som.dtw.TimeWarpPoint;
 import test.Statistics;
 
-
 public class SOM {
 
 	private static final double START_LEARNING_RATE = 0.1;
@@ -83,7 +82,7 @@ public class SOM {
 			double factor = getDistanceFactor(distance, radius) * getLearningRate();
 
 			if (values.length > weights[i].length) {
-				weights[i] = Arrays.copyOf(weights[i], (int) Math.round(weights[i].length + factor * (values.length - weights[i].length)));
+				weights[i] = Arrays.copyOf(weights[i], values.length);
 			}
 
 			List<TimeWarpPoint> path = DTW.getWarpPath(weights[i], values);
