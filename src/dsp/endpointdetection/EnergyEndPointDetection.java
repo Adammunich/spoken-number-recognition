@@ -36,7 +36,7 @@ public class EnergyEndPointDetection extends ThresholdEndPointDetection {
 
 	@Override
 	protected int getEndPointDetectionOffset() {
-		return 2;
+		return 3;
 	}
 
 }

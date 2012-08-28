@@ -2,7 +2,8 @@ package dsp.endpointdetection;
 
 import java.util.List;
 
-import dsp.Constants;
+import main.Constants;
+
 import dsp.model.Frame;
 
 /**

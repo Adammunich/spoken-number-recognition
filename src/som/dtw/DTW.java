@@ -3,7 +3,8 @@ package som.dtw;
 import java.util.LinkedList;
 import java.util.List;
 
-import dsp.Constants;
+import main.Constants;
+
 
 /**
  * @author niktrk
