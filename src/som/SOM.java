@@ -8,6 +8,12 @@ import som.dtw.DTW;
 import som.dtw.TimeWarpPoint;
 import test.Statistics;
 
+/**
+ * 
+ * @author igorletso
+ * @author niktrk
+ * 
+ */
 public class SOM {
 
 	private static final double START_LEARNING_RATE = 0.1;
@@ -21,7 +27,7 @@ public class SOM {
 
 	private Statistics stats;
 
-	public SOM(int numInput, int numOutput) {
+	public SOM(int numOutput) {
 		super();
 		this.numOutput = numOutput;
 		this.startRadius = numOutput / 2;
@@ -73,15 +79,12 @@ public class SOM {
 			if (distance > Math.round(radius)) {
 				continue;
 			}
-			// System.out.println("distance factor " + winner + " to " + i + " "
-			// + getDistanceFactor(distance, radius));
+
+			double factor = getDistanceFactor(distance, radius) * getLearningRate();
 
 			if (weights[i] == null) {
 				weights[i] = new double[values.length];
-			}
-			double factor = getDistanceFactor(distance, radius) * getLearningRate();
-
-			if (values.length > weights[i].length) {
+			} else if (values.length > weights[i].length) {
 				weights[i] = Arrays.copyOf(weights[i], values.length);
 			}
 

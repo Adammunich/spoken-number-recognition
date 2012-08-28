@@ -86,7 +86,7 @@ public class TestRecordMicToFile {
 	private static void testit(TrainingSet ts) {
 		for (int i = 0; i < 3; i++) {
 			long start = System.currentTimeMillis();
-			SOM som = new SOM(Constants.NUMBER_OF_SOM_INPUTS, 6);
+			SOM som = new SOM(6);
 			som.train(ts, 12000);
 			// som.getStats().print();
 			som.getStats().printAggregated(10, 100);

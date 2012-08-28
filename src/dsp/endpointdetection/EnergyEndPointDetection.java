@@ -5,6 +5,8 @@ import java.util.List;
 import dsp.model.Frame;
 
 /**
+ * 
+ * @author igorletso
  * @author niktrk
  * 
  */

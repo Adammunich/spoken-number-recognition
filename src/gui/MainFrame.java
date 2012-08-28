@@ -33,7 +33,9 @@ import javax.swing.UnsupportedLookAndFeelException;
 import net.miginfocom.swing.MigLayout;
 
 /**
+ * 
  * @author igorletso
+ * @author niktrk
  * 
  */
 public abstract class MainFrame extends JFrame {
@@ -87,7 +89,7 @@ public abstract class MainFrame extends JFrame {
 
 		Font labelFont = new Font("Arial", Font.PLAIN, 15);
 		JLabel recDig = new JLabel("Recognized digit: ");
-		JLabel digit = new JLabel("5");
+		final JLabel digit = new JLabel();
 		recDig.setFont(labelFont);
 		digit.setFont(labelFont);
 
@@ -153,13 +155,13 @@ public abstract class MainFrame extends JFrame {
 				if (recording == null) {
 					JOptionPane.showMessageDialog(MainFrame.this, "Nothing is recorded.", "Error", JOptionPane.ERROR_MESSAGE);
 				} else {
-					recognize(recording);
+					digit.setText(String.valueOf(recognize(recording)));
 				}
 			}
 
 		});
 	}
 
-	protected abstract void recognize(byte[] record);
+	protected abstract int recognize(byte[] record);
 
 }

@@ -18,9 +18,6 @@ public final class Constants {
 
 	public static final int MFCC_LENGTH = 13;
 
-	public static final int NUMBER_OF_SOM_INPUTS = 55 * MFCC_LENGTH;
-	public static final int NUMBER_OF_SOM_OUTPUTS = 3;
-
 	private Constants() {
 	}
 
