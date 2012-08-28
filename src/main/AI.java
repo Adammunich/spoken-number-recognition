@@ -2,11 +2,11 @@ package main;
 
 import gui.MainFrame;
 
-import java.util.Random;
-
 import javax.swing.JFrame;
 
-import dsp.util.AudioFileUtil;
+import som.Input;
+import som.SOM;
+import dsp.SignalProcessor;
 
 /**
  * 
@@ -16,8 +16,15 @@ import dsp.util.AudioFileUtil;
  */
 public class AI {
 
+	private static SOM som;
+
 	public static void main(String[] args) {
+		initAI();
 		initGUI();
+	}
+
+	private static void initAI() {
+		som = new SOM(10);
 	}
 
 	private static void initGUI() {
@@ -27,9 +34,7 @@ public class AI {
 
 			@Override
 			protected int recognize(byte[] record) {
-				System.out.println(record.length);
-				AudioFileUtil.writeFromByteArrayToFile("testt.wav", record);
-				return new Random().nextInt(10);
+				return som.findWinnerValue(new Input(SignalProcessor.process(record)));
 			}
 
 		};

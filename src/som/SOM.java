@@ -24,6 +24,7 @@ public class SOM {
 	private double[][] weights;
 	private int numIteration;
 	private int countIteration;
+	private int[] outputValueMap;
 
 	private Statistics stats;
 
@@ -32,6 +33,7 @@ public class SOM {
 		this.numOutput = numOutput;
 		this.startRadius = numOutput / 2;
 		this.weights = new double[numOutput][];
+		this.outputValueMap = new int[numOutput];
 		this.stats = new Statistics(numOutput);
 	}
 
@@ -40,6 +42,10 @@ public class SOM {
 		for (countIteration = 0; countIteration < numIteration; countIteration++) {
 			epoch(ts);
 		}
+	}
+
+	public int findWinnerValue(Input input) {
+		return outputValueMap[findWinner(input)];
 	}
 
 	public int findWinner(Input input) {
@@ -107,6 +113,10 @@ public class SOM {
 
 	private double getLearningRate() {
 		return START_LEARNING_RATE * Math.exp(-((double) countIteration) / numIteration);
+	}
+
+	public void mapOutput(int output, int value) {
+		outputValueMap[output] = value;
 	}
 
 	public Statistics getStats() {

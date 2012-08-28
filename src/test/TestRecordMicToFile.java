@@ -23,8 +23,6 @@ import dsp.util.AudioFileUtil;
 
 public class TestRecordMicToFile {
 
-	private static final int MEL_NUMBER_OF_FILTERS = 31;// 20-40
-
 	public static void main(String[] args) {
 
 		// for (int j = 5; j < 10; j++) {
@@ -55,7 +53,7 @@ public class TestRecordMicToFile {
 				List<Frame> removeStartAndEnd = endPointDetection.removeStartAndEnd();
 				System.out.println(removeStartAndEnd.size());
 
-				Transformation mel = new MelFilter(MEL_NUMBER_OF_FILTERS);
+				Transformation mel = new MelFilter(Constants.MEL_NUMBER_OF_FILTERS);
 				Transformation dct = new DCT();
 				Transformation sub = new SubRange(1, 1 + Constants.MFCC_LENGTH);
 				Transformation delta = new DeltaFeatures(2);
