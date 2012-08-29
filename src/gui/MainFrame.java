@@ -2,10 +2,12 @@ package gui;
 
 import gui.listeners.AproveOpenFolder;
 import gui.listeners.LoadFromFileListener;
+import gui.listeners.OpenRecordFromFileListener;
 import gui.listeners.ProgressBarListener;
 import gui.listeners.RecordListener;
 import gui.listeners.RemoveFileListener;
 import gui.listeners.SaveToFileListener;
+import gui.listeners.StartTrainingListener;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -20,6 +22,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -32,6 +35,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -44,6 +48,7 @@ import net.miginfocom.swing.MigLayout;
 public abstract class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = -3838320390904637165L;
+	private byte[] record;
 
 	public MainFrame() {
 		super("Spoken digits recognition");
@@ -84,16 +89,18 @@ public abstract class MainFrame extends JFrame {
 		JPanel down = new JPanel(new MigLayout());
 		DefaultListModel<File> model = new DefaultListModel<File>();
 		JList<File> fileList = new JList<File>(model) {
-
-			private static final long serialVersionUID = 2506194711677741791L;
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public String getToolTipText(MouseEvent evt) {
 				int index = locationToIndex(evt.getPoint());
-				File item = getModel().getElementAt(index);
-				return item.toString();
+				if (index > -1) {
+					File item = getModel().getElementAt(index);
+					return item.toString();
+				} else {
+					return null;
+				}
 			}
-
 		};
 		JScrollPane fileListScrollPane = new JScrollPane(fileList);
 		JButton openFolder = new JButton("Find training data");
@@ -119,6 +126,14 @@ public abstract class MainFrame extends JFrame {
 
 		JFileChooser saveFileDialog = new JFileChooser();
 		JFileChooser loadFileDialog = new JFileChooser();
+		FileNameExtensionFilter txtFilter = new FileNameExtensionFilter("Text files", "txt");
+		loadFileDialog.addChoosableFileFilter(txtFilter);
+		loadFileDialog.setFileFilter(txtFilter);
+
+		JFileChooser openWavFileDialog = new JFileChooser();
+		FileNameExtensionFilter wavFilter = new FileNameExtensionFilter("Wave files", "wav");
+		openWavFileDialog.addChoosableFileFilter(wavFilter);
+		openWavFileDialog.setFileFilter(wavFilter);
 
 		JMenuBar menu = new JMenuBar();
 		JMenu fileMenu = new JMenu("File");
@@ -149,6 +164,11 @@ public abstract class MainFrame extends JFrame {
 		p.add(up, "span, height 250:250:250, width 750:750:750");
 		p.add(down, "span, height 130:130:130, width 750:750:750");
 
+		JDialog trainingDialog = new JDialog(this);
+		trainingDialog.setModal(true);
+		trainingDialog.setSize(500, 250);
+		trainingDialog.setLocationRelativeTo(this);
+
 		openFolder.addActionListener(new AproveOpenFolder(openFolderDialog, fileList));
 
 		removeFile.addActionListener(new RemoveFileListener(fileList));
@@ -156,6 +176,10 @@ public abstract class MainFrame extends JFrame {
 		saveData.addActionListener(new SaveToFileListener(fileList, saveFileDialog));
 
 		loadData.addActionListener(new LoadFromFileListener(fileList, loadFileDialog));
+
+		openFile.addActionListener(new OpenRecordFromFileListener(record, openWavFileDialog));
+
+		startTraining.addActionListener(new StartTrainingListener(trainingDialog));
 
 		final RecordListener recordListener = new RecordListener(progressBar);
 		recordButton.addActionListener(recordListener);
@@ -175,10 +199,19 @@ public abstract class MainFrame extends JFrame {
 			}
 
 		});
+
 	}
 
 	protected abstract int recognize(byte[] record);
 
+	public byte[] getRecord() {
+		return record;
+	}
+
+	public void setRecord(byte[] record) {
+		this.record = record;
+	}
+	
 	protected abstract void train(List<String> filenames);
 
 }
