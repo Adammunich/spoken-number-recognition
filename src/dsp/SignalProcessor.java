@@ -27,7 +27,7 @@ public class SignalProcessor {
 	private static List<Transformation> firstPart;
 	private static List<Transformation> secondPart;
 
-	{
+	static {
 		firstPart = new ArrayList<>();
 		firstPart.add(new PreEmphasisFilter());
 		firstPart.add(new HammingWindow());

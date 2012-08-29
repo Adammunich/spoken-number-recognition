@@ -16,7 +16,7 @@ import test.Statistics;
  */
 public class SOM {
 
-	private static final double START_LEARNING_RATE = 0.1;
+	private static final double START_LEARNING_RATE = 0.3;
 	private static final Random RANDOM = new Random();
 
 	private int numOutput;
