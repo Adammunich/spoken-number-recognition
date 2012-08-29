@@ -17,10 +17,11 @@ import test.Statistics;
 public class SOM {
 
 	private static final double START_LEARNING_RATE = 0.3;
+	private static final int START_RADIUS = 1;
+
 	private static final Random RANDOM = new Random();
 
 	private int numOutput;
-	private double startRadius;
 	private double[][] weights;
 	private int numIteration;
 	private int countIteration;
@@ -31,7 +32,6 @@ public class SOM {
 	public SOM(int numOutput) {
 		super();
 		this.numOutput = numOutput;
-		this.startRadius = numOutput / 2;
 		this.weights = new double[numOutput][];
 		this.outputValueMap = new int[numOutput];
 		this.stats = new Statistics(numOutput);
@@ -108,7 +108,7 @@ public class SOM {
 	}
 
 	private double getNeighbourhoodRadius() {
-		return startRadius * Math.exp(-((double) countIteration) / numIteration);
+		return START_RADIUS * Math.exp(-((double) countIteration) / numIteration);
 	}
 
 	private double getLearningRate() {

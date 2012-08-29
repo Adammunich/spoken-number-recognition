@@ -2,6 +2,8 @@ package main;
 
 import gui.MainFrame;
 
+import java.util.List;
+
 import javax.swing.JFrame;
 
 import som.Input;
@@ -35,6 +37,11 @@ public class AI {
 			@Override
 			protected int recognize(byte[] record) {
 				return som.findWinnerValue(new Input(SignalProcessor.process(record)));
+			}
+
+			@Override
+			protected void train(List<String> filenames) {
+
 			}
 
 		};

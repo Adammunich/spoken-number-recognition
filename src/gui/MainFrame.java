@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -83,7 +84,8 @@ public abstract class MainFrame extends JFrame {
 		JPanel down = new JPanel(new MigLayout());
 		DefaultListModel<File> model = new DefaultListModel<File>();
 		JList<File> fileList = new JList<File>(model) {
-			private static final long serialVersionUID = 1L;
+
+			private static final long serialVersionUID = 2506194711677741791L;
 
 			@Override
 			public String getToolTipText(MouseEvent evt) {
@@ -91,6 +93,7 @@ public abstract class MainFrame extends JFrame {
 				File item = getModel().getElementAt(index);
 				return item.toString();
 			}
+
 		};
 		JScrollPane fileListScrollPane = new JScrollPane(fileList);
 		JButton openFolder = new JButton("Find training data");
@@ -175,5 +178,7 @@ public abstract class MainFrame extends JFrame {
 	}
 
 	protected abstract int recognize(byte[] record);
+
+	protected abstract void train(List<String> filenames);
 
 }

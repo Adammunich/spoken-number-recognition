@@ -24,6 +24,9 @@ import dsp.util.AudioFileUtil;
  */
 public class SignalProcessor {
 
+	private static final int MEL_NUMBER_OF_FILTERS = 31;// 20-40
+	private static final int MFCC_LENGTH = 13;
+
 	private static List<Transformation> firstPart;
 	private static List<Transformation> secondPart;
 
@@ -33,9 +36,9 @@ public class SignalProcessor {
 		firstPart.add(new HammingWindow());
 		firstPart.add(new FFT());
 		secondPart = new ArrayList<>();
-		secondPart.add(new MelFilter(Constants.MEL_NUMBER_OF_FILTERS));
+		secondPart.add(new MelFilter(MEL_NUMBER_OF_FILTERS));
 		secondPart.add(new DCT());
-		secondPart.add(new SubRange(1, 1 + Constants.MFCC_LENGTH));
+		secondPart.add(new SubRange(1, 1 + MFCC_LENGTH));
 		secondPart.add(new DeltaFeatures(2));
 		secondPart.add(new WeightedMFCC());
 	}
@@ -49,13 +52,13 @@ public class SignalProcessor {
 		}
 		ThresholdEndPointDetection endPointDetection = new EnergyEndPointDetection(frames);
 		List<Frame> removeStartAndEnd = endPointDetection.removeStartAndEnd();
-		double[] result = new double[removeStartAndEnd.size() * Constants.MFCC_LENGTH];
+		double[] result = new double[removeStartAndEnd.size() * MFCC_LENGTH];
 		int k = 0;
 		for (Frame frame : removeStartAndEnd) {
 			for (Transformation transformation : secondPart) {
 				frame.applyTransformation(transformation);
 			}
-			System.arraycopy(frame.getBuffer(), 0, result, k * Constants.MFCC_LENGTH, Constants.MFCC_LENGTH);
+			System.arraycopy(frame.getBuffer(), 0, result, k * MFCC_LENGTH, MFCC_LENGTH);
 			k++;
 		}
 		return result;
