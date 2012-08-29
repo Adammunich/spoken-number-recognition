@@ -10,10 +10,9 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.JProgressBar;
 
-public class RecordListener implements ActionListener, PropertyChangeListener {
+public abstract class RecordListener implements ActionListener, PropertyChangeListener {
 
 	private JProgressBar progressBar;
-	private Record record;
 
 	public RecordListener(JProgressBar progressBar) {
 		super();
@@ -22,7 +21,19 @@ public class RecordListener implements ActionListener, PropertyChangeListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		record = new Record();
+		progressBar.setValue(0);
+		Record record = new Record() {
+
+			@Override
+			protected void done() {
+				try {
+					onRecordingDone(get());
+				} catch (InterruptedException | ExecutionException e) {
+					throw new IllegalStateException("Can't get recording: " + e.getMessage());
+				}
+			}
+
+		};
 		record.execute();
 		record.addPropertyChangeListener(this);
 	}
@@ -35,16 +46,6 @@ public class RecordListener implements ActionListener, PropertyChangeListener {
 		}
 	}
 
-	public byte[] getRecording() {
-		try {
-			if (record == null) {
-				return null;
-			} else {
-				return record.get();
-			}
-		} catch (InterruptedException | ExecutionException e) {
-			throw new IllegalStateException("Can't get recording: " + e.getMessage());
-		}
-	}
+	protected abstract void onRecordingDone(byte[] recording);
 
 }

@@ -3,7 +3,6 @@ package gui;
 import gui.listeners.AproveOpenFolder;
 import gui.listeners.LoadFromFileListener;
 import gui.listeners.OpenRecordFromFileListener;
-import gui.listeners.ProgressBarListener;
 import gui.listeners.RecordListener;
 import gui.listeners.RemoveFileListener;
 import gui.listeners.SaveToFileListener;
@@ -50,7 +49,6 @@ import net.miginfocom.swing.MigLayout;
 public abstract class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = -3838320390904637165L;
-	private byte[] record;
 
 	public MainFrame() {
 		super("Spoken digits recognition");
@@ -119,8 +117,7 @@ public abstract class MainFrame extends JFrame {
 
 		JButton recordButton = new JButton("Record");
 		JButton openFile = new JButton("Open from file");
-		JButton recognize = new JButton("Recognize");
-		JProgressBar progressBar = new JProgressBar(0, 101);
+		JProgressBar progressBar = new JProgressBar(0, 100);
 		progressBar.setValue(0);
 
 		JFileChooser openFolderDialog = new JFileChooser();
@@ -158,7 +155,6 @@ public abstract class MainFrame extends JFrame {
 		down.setBorder(BorderFactory.createTitledBorder("Recognition"));
 		down.add(recordButton, "align center");
 		down.add(openFile, "split 2");
-		down.add(recognize, "wrap");
 		down.add(progressBar, "wrap 15px");
 		down.add(recDig, "split 2");
 		down.add(digit);
@@ -179,25 +175,22 @@ public abstract class MainFrame extends JFrame {
 
 		loadData.addActionListener(new LoadFromFileListener(fileList, loadFileDialog));
 
-		openFile.addActionListener(new OpenRecordFromFileListener(record, openWavFileDialog));
+		openFile.addActionListener(new OpenRecordFromFileListener(openWavFileDialog) {
+
+			@Override
+			protected void onRecordLoaded(byte[] record) {
+				digit.setText(recognize(record));
+			}
+
+		});
 
 		startTraining.addActionListener(new StartTrainingListener(trainingDialog));
 
-		final RecordListener recordListener = new RecordListener(progressBar);
-		recordButton.addActionListener(recordListener);
-
-		progressBar.addChangeListener(new ProgressBarListener(progressBar));
-
-		recognize.addActionListener(new ActionListener() {
+		recordButton.addActionListener(new RecordListener(progressBar) {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				byte[] recording = recordListener.getRecording();
-				if (recording == null) {
-					JOptionPane.showMessageDialog(MainFrame.this, "Nothing is recorded.", "Error", JOptionPane.ERROR_MESSAGE);
-				} else {
-					digit.setText(recognize(recording));
-				}
+			protected void onRecordingDone(byte[] recording) {
+				digit.setText(recognize(recording));
 			}
 
 		});
@@ -220,14 +213,6 @@ public abstract class MainFrame extends JFrame {
 
 	protected abstract String recognize(byte[] record);
 
-	public byte[] getRecord() {
-		return record;
-	}
-
-	public void setRecord(byte[] record) {
-		this.record = record;
-	}
-	
 	protected abstract void train(List<String> filenames, int numIterations);
 
 }

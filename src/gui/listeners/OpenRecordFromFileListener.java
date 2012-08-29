@@ -8,30 +8,23 @@ import javax.swing.JOptionPane;
 
 import dsp.util.AudioFileUtil;
 
-public class OpenRecordFromFileListener implements ActionListener {
+public abstract class OpenRecordFromFileListener implements ActionListener {
 	private JFileChooser dialog;
-	private byte[] record;
 
-	public OpenRecordFromFileListener(byte[] record, JFileChooser dialog) {
+	public OpenRecordFromFileListener(JFileChooser dialog) {
 		this.dialog = dialog;
-		this.record = record;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		dialog.showOpenDialog(dialog.getParent());
 		if (dialog.getSelectedFile() != null) {
-			record = AudioFileUtil.readFromFileToByteArray(dialog.getSelectedFile().getAbsolutePath());
+			byte[] record = AudioFileUtil.readFromFileToByteArray(dialog.getSelectedFile().getAbsolutePath());
 			JOptionPane.showMessageDialog(null, "Your recored has been loaded.");
-
+			onRecordLoaded(record);
 		}
 	}
 
-	public byte[] getRecord() {
-		return record;
-	}
+	protected abstract void onRecordLoaded(byte[] record);
 
-	public void setRecord(byte[] record) {
-		this.record = record;
-	}
 }

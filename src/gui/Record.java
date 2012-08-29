@@ -51,9 +51,4 @@ public class Record extends SwingWorker<byte[], Byte> {
 		return out.toByteArray();
 	}
 
-	@Override
-	public void done() {
-		setProgress(100);
-	}
-
 }
