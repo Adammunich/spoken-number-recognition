@@ -79,6 +79,13 @@ public class AudioFileUtil {
 		writeFromStreamToFile(filename, audioInputStream);
 	}
 
+	// filename format i-j.wav; i range is [0..9] and j range is [0,+inf)
+	public static String getInputValueFromFilename(String filename) {
+		String[] tokens = filename.split("-");
+		String beforeLastToken = tokens[tokens.length - 2];
+		return beforeLastToken.substring(beforeLastToken.length() - 1);
+	}
+
 	// public static void windowedFramesToFile(List<Frame> frames, int index) {
 	// ByteArrayOutputStream outtrans = new ByteArrayOutputStream();
 	// for (int i = 0; i < frames.size(); i += 2) {// because step is 0.5

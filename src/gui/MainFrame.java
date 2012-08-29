@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -33,6 +34,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.ListModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -88,7 +90,7 @@ public abstract class MainFrame extends JFrame {
 		JPanel up = new JPanel(new MigLayout());
 		JPanel down = new JPanel(new MigLayout());
 		DefaultListModel<File> model = new DefaultListModel<File>();
-		JList<File> fileList = new JList<File>(model) {
+		final JList<File> fileList = new JList<File>(model) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -194,15 +196,29 @@ public abstract class MainFrame extends JFrame {
 				if (recording == null) {
 					JOptionPane.showMessageDialog(MainFrame.this, "Nothing is recorded.", "Error", JOptionPane.ERROR_MESSAGE);
 				} else {
-					digit.setText(String.valueOf(recognize(recording)));
+					digit.setText(recognize(recording));
 				}
+			}
+
+		});
+
+		startTraining.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				List<String> filenames = new ArrayList<String>();
+				ListModel<File> fileListModel = fileList.getModel();
+				for (int i = 0; i < fileListModel.getSize(); i++) {
+					filenames.add(fileListModel.getElementAt(i).getAbsolutePath());
+				}
+				train(filenames, 2500);
 			}
 
 		});
 
 	}
 
-	protected abstract int recognize(byte[] record);
+	protected abstract String recognize(byte[] record);
 
 	public byte[] getRecord() {
 		return record;
@@ -212,6 +228,6 @@ public abstract class MainFrame extends JFrame {
 		this.record = record;
 	}
 	
-	protected abstract void train(List<String> filenames);
+	protected abstract void train(List<String> filenames, int numIterations);
 
 }

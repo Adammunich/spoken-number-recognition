@@ -1,7 +1,9 @@
 package som;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import som.dtw.DTW;
@@ -17,7 +19,7 @@ import test.Statistics;
 public class SOM {
 
 	private static final double START_LEARNING_RATE = 0.3;
-	private static final int START_RADIUS = 1;
+	private static final double START_RADIUS = 1;
 
 	private static final Random RANDOM = new Random();
 
@@ -25,15 +27,21 @@ public class SOM {
 	private double[][] weights;
 	private int numIteration;
 	private int countIteration;
-	private int[] outputValueMap;
+	public String[] outputValueMap;
+	private Map<String, Integer>[] outputInputFrequencyMap;
 
 	private Statistics stats;
 
+	@SuppressWarnings("unchecked")
 	public SOM(int numOutput) {
 		super();
 		this.numOutput = numOutput;
 		this.weights = new double[numOutput][];
-		this.outputValueMap = new int[numOutput];
+		this.outputValueMap = new String[numOutput];
+		this.outputInputFrequencyMap = new HashMap[numOutput];
+		for (int i = 0; i < outputInputFrequencyMap.length; i++) {
+			this.outputInputFrequencyMap[i] = new HashMap<String, Integer>();
+		}
 		this.stats = new Statistics(numOutput);
 	}
 
@@ -41,10 +49,33 @@ public class SOM {
 		this.numIteration = numIteration;
 		for (countIteration = 0; countIteration < numIteration; countIteration++) {
 			epoch(ts);
+			onIteration(countIteration);
+		}
+		mapOutputs();
+	}
+
+	protected void onIteration(int iteration) {
+		// do nothing by default
+	}
+
+	private void mapOutputs() {
+		int max;
+		String value;
+		for (int i = 0; i < outputInputFrequencyMap.length; i++) {
+			Map<String, Integer> outputMap = outputInputFrequencyMap[i];
+			max = Integer.MIN_VALUE;
+			value = null;
+			for (Map.Entry<String, Integer> entry : outputMap.entrySet()) {
+				if (entry.getValue() > max) {
+					max = entry.getValue();
+					value = entry.getKey();
+				}
+			}
+			outputValueMap[i] = value;
 		}
 	}
 
-	public int findWinnerValue(Input input) {
+	public String findWinnerValue(Input input) {
 		return outputValueMap[findWinner(input)];
 	}
 
@@ -73,8 +104,22 @@ public class SOM {
 		int index = RANDOM.nextInt(ts.getInputs().length);
 		Input input = ts.getInputs()[index];
 		int winner = findWinner(input);
+		addToOutputInputMap(winner, input);
+
+		// stats
 		stats.add(index, winner);
+
 		adjustWeights(input, winner);
+	}
+
+	private void addToOutputInputMap(int output, Input input) {
+		Map<String, Integer> outputMap = outputInputFrequencyMap[output];
+		String inputName = input.getInputName();
+		if (outputMap.get(inputName) == null) {
+			outputMap.put(inputName, 1);
+		} else {
+			outputMap.put(inputName, outputMap.get(inputName) + 1);
+		}
 	}
 
 	private void adjustWeights(Input input, int winner) {
@@ -113,10 +158,6 @@ public class SOM {
 
 	private double getLearningRate() {
 		return START_LEARNING_RATE * Math.exp(-((double) countIteration) / numIteration);
-	}
-
-	public void mapOutput(int output, int value) {
-		outputValueMap[output] = value;
 	}
 
 	public Statistics getStats() {

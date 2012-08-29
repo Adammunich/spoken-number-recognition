@@ -8,7 +8,9 @@ import javax.swing.JFrame;
 
 import som.Input;
 import som.SOM;
+import som.TrainingSet;
 import dsp.SignalProcessor;
+import dsp.util.AudioFileUtil;
 
 /**
  * 
@@ -19,6 +21,7 @@ import dsp.SignalProcessor;
 public class AI {
 
 	private static SOM som;
+	private static JFrame mainFrame;
 
 	public static void main(String[] args) {
 		initAI();
@@ -26,26 +29,39 @@ public class AI {
 	}
 
 	private static void initAI() {
-		som = new SOM(10);
-	}
-
-	private static void initGUI() {
-		JFrame frame = new MainFrame() {
-
-			private static final long serialVersionUID = -541142373678783751L;
+		som = new SOM(3) {
 
 			@Override
-			protected int recognize(byte[] record) {
-				return som.findWinnerValue(new Input(SignalProcessor.process(record)));
-			}
-
-			@Override
-			protected void train(List<String> filenames) {
+			protected void onIteration(int iteration) {
 
 			}
 
 		};
-		frame.setVisible(true);
+	}
+
+	private static void initGUI() {
+		mainFrame = new MainFrame() {
+
+			private static final long serialVersionUID = -541142373678783751L;
+
+			@Override
+			protected String recognize(byte[] record) {
+				return som.findWinnerValue(new Input(SignalProcessor.process(record), "?"));
+			}
+
+			@Override
+			protected void train(List<String> filenames, int numIteration) {
+				Input[] inputs = new Input[filenames.size()];
+				for (int i = 0; i < inputs.length; i++) {
+					double[] signal = SignalProcessor.process(AudioFileUtil.readFromFileToByteArray(filenames.get(i)));
+					String inputName = AudioFileUtil.getInputValueFromFilename(filenames.get(i));
+					inputs[i] = new Input(signal, inputName);
+				}
+				som.train(new TrainingSet(inputs), numIteration);
+			}
+
+		};
+		mainFrame.setVisible(true);
 	}
 
 }
