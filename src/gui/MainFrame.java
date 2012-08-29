@@ -33,7 +33,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.ListModel;
+import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -49,6 +51,7 @@ import net.miginfocom.swing.MigLayout;
 public abstract class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = -3838320390904637165L;
+	private JProgressBar trainingProgress;
 
 	public MainFrame() {
 		super("Spoken digits recognition");
@@ -107,7 +110,7 @@ public abstract class MainFrame extends JFrame {
 		JButton removeFile = new JButton("Remove file");
 		JButton saveData = new JButton("Save training data to file");
 		JButton loadData = new JButton("Load training data from file");
-		JButton startTraining = new JButton("Start training");
+		JButton trainNetwork = new JButton("Train network");
 
 		Font labelFont = new Font("Arial", Font.PLAIN, 15);
 		JLabel recDig = new JLabel("Recognized digit: ");
@@ -150,7 +153,7 @@ public abstract class MainFrame extends JFrame {
 		up.add(removeFile, "wrap");
 		up.add(saveData, "wrap");
 		up.add(loadData, "wrap 10px");
-		up.add(startTraining);
+		up.add(trainNetwork);
 
 		down.setBorder(BorderFactory.createTitledBorder("Recognition"));
 		down.add(recordButton, "align center");
@@ -163,9 +166,20 @@ public abstract class MainFrame extends JFrame {
 		p.add(down, "span, height 130:130:130, width 750:750:750");
 
 		JDialog trainingDialog = new JDialog(this);
+		trainingDialog.setTitle("Start training");
 		trainingDialog.setModal(true);
-		trainingDialog.setSize(500, 250);
+		trainingDialog.setSize(440, 200);
 		trainingDialog.setLocationRelativeTo(this);
+		JPanel trainingPanel = new JPanel(new MigLayout());
+		JButton trainSom = new JButton("Start training");
+		final JSpinner numIteration = new JSpinner();
+		trainingProgress = new JProgressBar();
+		JLabel numIterationLabel = new JLabel("Enter the number of iterations:");
+		trainingPanel.add(numIterationLabel, "gapleft 25, gaptop 50");
+		trainingPanel.add(numIteration, "width 50:50:50");
+		trainingPanel.add(trainSom, "gapleft 50");
+		trainingPanel.add(trainingProgress, "gapleft 25, gaptop 20 ,cell 0 4 4 4, width 350:350:350");
+		trainingDialog.add(trainingPanel);
 
 		openFolder.addActionListener(new AproveOpenFolder(openFolderDialog, fileList));
 
@@ -175,16 +189,14 @@ public abstract class MainFrame extends JFrame {
 
 		loadData.addActionListener(new LoadFromFileListener(fileList, loadFileDialog));
 
-		openFile.addActionListener(new OpenRecordFromFileListener(openWavFileDialog) {
+		trainNetwork.addActionListener(new StartTrainingListener(trainingDialog));
 
+		openFile.addActionListener(new OpenRecordFromFileListener(openWavFileDialog) {
 			@Override
 			protected void onRecordLoaded(byte[] record) {
 				digit.setText(recognize(record));
 			}
-
 		});
-
-		startTraining.addActionListener(new StartTrainingListener(trainingDialog));
 
 		recordButton.addActionListener(new RecordListener(progressBar) {
 
@@ -195,7 +207,7 @@ public abstract class MainFrame extends JFrame {
 
 		});
 
-		startTraining.addActionListener(new ActionListener() {
+		trainSom.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -204,15 +216,36 @@ public abstract class MainFrame extends JFrame {
 				for (int i = 0; i < fileListModel.getSize(); i++) {
 					filenames.add(fileListModel.getElementAt(i).getAbsolutePath());
 				}
-				train(filenames, 2500);
+				trainingProgress.setMinimum(0);
+				trainingProgress.setMaximum((int) numIteration.getValue());
+
+				SwingWorker<Void, Void> sw = createSwingWorker(filenames, (int) numIteration.getValue());
+				sw.execute();
+
 			}
 
 		});
 
 	}
 
+	protected SwingWorker<Void, Void> createSwingWorker(final List<String> filenames, final int numIterations) {
+		return new SwingWorker<Void, Void>() {
+
+			@Override
+			protected Void doInBackground() throws Exception {
+				train(filenames, numIterations);
+				return null;
+			}
+
+		};
+	}
+
 	protected abstract String recognize(byte[] record);
 
 	protected abstract void train(List<String> filenames, int numIterations);
+
+	public void setProgress(int n) {
+		trainingProgress.setValue(n);
+	}
 
 }

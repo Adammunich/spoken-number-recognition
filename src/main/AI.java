@@ -4,8 +4,6 @@ import gui.MainFrame;
 
 import java.util.List;
 
-import javax.swing.JFrame;
-
 import som.Input;
 import som.SOM;
 import som.TrainingSet;
@@ -21,7 +19,7 @@ import dsp.util.AudioFileUtil;
 public class AI {
 
 	private static SOM som;
-	private static JFrame mainFrame;
+	private static MainFrame mainFrame;
 
 	public static void main(String[] args) {
 		initAI();
@@ -33,7 +31,7 @@ public class AI {
 
 			@Override
 			protected void onIteration(int iteration) {
-
+				mainFrame.setProgress(iteration);
 			}
 
 		};
