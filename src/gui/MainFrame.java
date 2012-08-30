@@ -151,12 +151,12 @@ public abstract class MainFrame extends JFrame {
 
 		up.setBorder(BorderFactory.createTitledBorder("Training"));
 		up.add(fileListScrollPane, "span 1 7, height 200:200:200, width 500:500:500");
-		up.add(openFolder, "wrap");
-		up.add(removeFile, "wrap");
-		up.add(saveData, "wrap");
+		up.add(openFolder, "wrap 4");
+		up.add(removeFile, "wrap 4");
+		up.add(saveData, "wrap 4");
 		up.add(loadData, "wrap 22px");
-		up.add(trainNetwork, "wrap");
-		up.add(saveSom, "wrap");
+		up.add(trainNetwork, "wrap 4");
+		up.add(saveSom, "wrap 4");
 		up.add(loadSom);
 
 		down.setBorder(BorderFactory.createTitledBorder("Recognition"));
