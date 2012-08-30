@@ -62,7 +62,7 @@ public abstract class MainFrame extends JFrame {
 	private void initFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-		setSize(780, 445);
+		setSize(780, 400);
 	}
 
 	private void setPosition() {
@@ -114,9 +114,10 @@ public abstract class MainFrame extends JFrame {
 
 		Font labelFont = new Font("Arial", Font.PLAIN, 15);
 		JLabel recDig = new JLabel("Recognized digit: ");
+		Font digitFont = new Font("Arial", Font.BOLD, 25);
 		final JLabel digit = new JLabel();
 		recDig.setFont(labelFont);
-		digit.setFont(labelFont);
+		digit.setFont(digitFont);
 
 		JButton recordButton = new JButton("Record");
 		JButton openFile = new JButton("Open from file");
@@ -160,18 +161,18 @@ public abstract class MainFrame extends JFrame {
 
 		down.setBorder(BorderFactory.createTitledBorder("Recognition"));
 		down.add(recordButton, "align center");
-		down.add(openFile, "split 2, wrap");
-		down.add(progressBar, "wrap 15px");
-		down.add(recDig, "split 2");
-		down.add(digit);
+		down.add(openFile, "split 2");
+		down.add(recDig, "gapleft 150, split 2");
+		down.add(digit, "wrap");
+		down.add(progressBar);
 
 		p.add(up, "span, height 250:250:250, width 750:750:750");
-		p.add(down, "span, height 130:130:130, width 750:750:750");
+		p.add(down, "span, height 90:90:90, width 750:750:750");
 
 		JDialog trainingDialog = new JDialog(this);
 		trainingDialog.setTitle("Start training");
 		trainingDialog.setModal(true);
-		trainingDialog.setSize(505, 200);
+		trainingDialog.setSize(445, 200);
 		trainingDialog.setLocationRelativeTo(this);
 		JPanel trainingPanel = new JPanel(new MigLayout());
 		JButton trainSom = new JButton("Start training");
