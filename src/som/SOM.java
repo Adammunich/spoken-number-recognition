@@ -1,10 +1,17 @@
 package som;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
+
+import javax.swing.JOptionPane;
 
 import som.dtw.DTW;
 import som.dtw.TimeWarpPoint;
@@ -164,4 +171,47 @@ public class SOM {
 		return stats;
 	}
 
+	public void saveToFile(File file) {
+		try {
+			BufferedWriter output = new BufferedWriter(new FileWriter(file));
+			output.write(Integer.toString(numOutput));
+			output.newLine();
+			for (int i = 0; i < weights.length; i++) {
+				for (int k = 0; k < weights[i].length; k++) {
+					output.write(Double.toString(weights[i][k]));
+					output.write(";");
+				}
+				output.newLine();
+			}
+			for (int i = 0; i < outputValueMap.length; i++) {
+				output.write(outputValueMap[i]);
+				output.newLine();
+			}
+			output.close();
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "Error occured while trying to save the network.");
+		}
+	}
+
+	public void loadFromFile(File file) {
+		try {
+			Scanner scanner = new Scanner(file);
+			numOutput = scanner.nextInt();
+			scanner.nextLine();
+			for (int i = 0; i < numOutput; i++) {
+				String line = scanner.nextLine();
+				String[] splits = line.split(";");
+				double[] array = new double[splits.length];
+				for (int j = 0; j < splits.length; j++) {
+					array[j] = Double.parseDouble(splits[j]);
+				}
+				weights[i] = array.clone();
+			}
+			for (int i = 0; scanner.hasNextLine(); i++) {
+				outputValueMap[i] = scanner.nextLine();
+			}
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "Chosen file is not valid.");
+		}
+	}
 }

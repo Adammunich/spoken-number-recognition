@@ -27,8 +27,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -64,7 +62,7 @@ public abstract class MainFrame extends JFrame {
 	private void initFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-		setSize(780, 500);
+		setSize(780, 445);
 	}
 
 	private void setPosition() {
@@ -111,6 +109,8 @@ public abstract class MainFrame extends JFrame {
 		JButton saveData = new JButton("Save training data to file");
 		JButton loadData = new JButton("Load training data from file");
 		JButton trainNetwork = new JButton("Train network");
+		JButton saveSom = new JButton("Save network to file");
+		JButton loadSom = new JButton("Load network from file");
 
 		Font labelFont = new Font("Arial", Font.PLAIN, 15);
 		JLabel recDig = new JLabel("Recognized digit: ");
@@ -132,32 +132,35 @@ public abstract class MainFrame extends JFrame {
 		loadFileDialog.addChoosableFileFilter(txtFilter);
 		loadFileDialog.setFileFilter(txtFilter);
 
+		final JFileChooser saveSomDialog = new JFileChooser();
+		saveSomDialog.addChoosableFileFilter(txtFilter);
+		saveSomDialog.setFileFilter(txtFilter);
+
+		final JFileChooser loadSomDialog = new JFileChooser();
+		loadSomDialog.addChoosableFileFilter(txtFilter);
+		loadSomDialog.setFileFilter(txtFilter);
+
 		JFileChooser openWavFileDialog = new JFileChooser();
 		FileNameExtensionFilter wavFilter = new FileNameExtensionFilter("Wave files", "wav");
 		openWavFileDialog.addChoosableFileFilter(wavFilter);
 		openWavFileDialog.setFileFilter(wavFilter);
 
-		JMenuBar menu = new JMenuBar();
-		JMenu fileMenu = new JMenu("File");
-		JMenu helpMenu = new JMenu("Help");
-		menu.add(fileMenu);
-		menu.add(helpMenu);
-		setJMenuBar(menu);
-
 		Container cp = getContentPane();
 		cp.add(p);
 
 		up.setBorder(BorderFactory.createTitledBorder("Training"));
-		up.add(fileListScrollPane, "span 1 5, height 200:200:200, width 500:500:500");
+		up.add(fileListScrollPane, "span 1 7, height 200:200:200, width 500:500:500");
 		up.add(openFolder, "wrap");
 		up.add(removeFile, "wrap");
 		up.add(saveData, "wrap");
-		up.add(loadData, "wrap 10px");
-		up.add(trainNetwork);
+		up.add(loadData, "wrap 22px");
+		up.add(trainNetwork, "wrap");
+		up.add(saveSom, "wrap");
+		up.add(loadSom);
 
 		down.setBorder(BorderFactory.createTitledBorder("Recognition"));
 		down.add(recordButton, "align center");
-		down.add(openFile, "split 2");
+		down.add(openFile, "split 2, wrap");
 		down.add(progressBar, "wrap 15px");
 		down.add(recDig, "split 2");
 		down.add(digit);
@@ -168,7 +171,7 @@ public abstract class MainFrame extends JFrame {
 		JDialog trainingDialog = new JDialog(this);
 		trainingDialog.setTitle("Start training");
 		trainingDialog.setModal(true);
-		trainingDialog.setSize(440, 200);
+		trainingDialog.setSize(505, 200);
 		trainingDialog.setLocationRelativeTo(this);
 		JPanel trainingPanel = new JPanel(new MigLayout());
 		JButton trainSom = new JButton("Start training");
@@ -226,6 +229,26 @@ public abstract class MainFrame extends JFrame {
 
 		});
 
+		saveSom.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				saveSomDialog.showSaveDialog(saveSomDialog.getParent());
+				if (saveSomDialog.getSelectedFile() != null) {
+					saveSomToFile(saveSomDialog.getSelectedFile());
+				}
+			}
+		});
+
+		loadSom.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				loadSomDialog.showOpenDialog(loadSomDialog.getParent());
+				if (loadSomDialog.getSelectedFile() != null) {
+					loadSomFromFile(loadSomDialog.getSelectedFile());
+				}
+			}
+		});
+
 	}
 
 	protected SwingWorker<Void, Void> createSwingWorker(final List<String> filenames, final int numIterations) {
@@ -243,6 +266,10 @@ public abstract class MainFrame extends JFrame {
 	protected abstract String recognize(byte[] record);
 
 	protected abstract void train(List<String> filenames, int numIterations);
+
+	protected abstract void saveSomToFile(File file);
+
+	protected abstract void loadSomFromFile(File file);
 
 	public void setProgress(int n) {
 		trainingProgress.setValue(n);

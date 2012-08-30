@@ -2,6 +2,7 @@ package main;
 
 import gui.MainFrame;
 
+import java.io.File;
 import java.util.List;
 
 import som.Input;
@@ -56,6 +57,16 @@ public class AI {
 					inputs[i] = new Input(signal, inputName);
 				}
 				som.train(new TrainingSet(inputs), numIteration);
+			}
+
+			@Override
+			protected void saveSomToFile(File file) {
+				som.saveToFile(file);
+			}
+
+			@Override
+			protected void loadSomFromFile(File file) {
+				som.loadFromFile(file);
 			}
 
 		};
