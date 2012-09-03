@@ -12,6 +12,12 @@ import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 
+/**
+ * 
+ * @author igorletso
+ * @author niktrk
+ * 
+ */
 public class LoadFromFileListener implements ActionListener {
 
 	private JList<File> fileList;

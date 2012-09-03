@@ -5,7 +5,14 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JDialog;
 
+/**
+ * 
+ * @author igorletso
+ * @author niktrk
+ * 
+ */
 public class StartTrainingListener implements ActionListener {
+
 	private JDialog dialog;
 
 	public StartTrainingListener(JDialog dialog) {

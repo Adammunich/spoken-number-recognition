@@ -3,10 +3,11 @@ package dsp.endpointdetection;
 import java.util.List;
 
 import main.Constants;
-
 import dsp.model.Frame;
 
 /**
+ * 
+ * @author igorletso
  * @author niktrk
  * 
  */
@@ -23,18 +24,12 @@ public class EntropyEndPointDetection extends ThresholdEndPointDetection {
 		// total energy
 		double totalSpectralEnergy = 0d;
 		for (int i = 0; i < frame.getBuffer().length / 2; i++) {
-			// if (i * Constants.FREQUENCY_STEP > 350 && i *
-			// Constants.FREQUENCY_STEP < 3750) {
 			totalSpectralEnergy += frame.getBuffer()[i];
-			// }
 		}
 		// probability
 		double[] probabilityDensity = new double[frame.getBuffer().length / 2];
 		for (int i = 0; i < probabilityDensity.length; i++) {
-			if (Math.abs(totalSpectralEnergy) < Constants.EPS)
-			// || (i * Constants. FREQUENCY_STEP <= 350 || i *
-			// Constants.FREQUENCY_STEP >= 3750))
-			{
+			if (Math.abs(totalSpectralEnergy) < Constants.EPS) {
 				probabilityDensity[i] = 0d;
 			} else {
 				probabilityDensity[i] = frame.getBuffer()[i] / totalSpectralEnergy;

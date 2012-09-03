@@ -3,6 +3,8 @@ package dsp.transformation;
 import dsp.model.ComplexNumber;
 
 /**
+ * 
+ * @author igorletso
  * @author niktrk
  * 
  */

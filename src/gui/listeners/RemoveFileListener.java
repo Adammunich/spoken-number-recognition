@@ -7,6 +7,12 @@ import java.io.File;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
+/**
+ * 
+ * @author igorletso
+ * @author niktrk
+ * 
+ */
 public class RemoveFileListener implements ActionListener {
 
 	private JList<File> fileList;
@@ -25,4 +31,5 @@ public class RemoveFileListener implements ActionListener {
 			count++;
 		}
 	}
+
 }

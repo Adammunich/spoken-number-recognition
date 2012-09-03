@@ -2,8 +2,9 @@ package dsp.transformation;
 
 import java.util.Arrays;
 
-
 /**
+ * 
+ * @author igorletso
  * @author niktrk
  * 
  */

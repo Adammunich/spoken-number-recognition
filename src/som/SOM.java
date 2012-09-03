@@ -25,8 +25,8 @@ import test.Statistics;
  */
 public class SOM {
 
-	private static final double START_LEARNING_RATE = 0.3;
-	private static final double START_RADIUS = 1;
+	private static final double START_LEARNING_RATE = 0.35;
+	private static final double START_RADIUS = 0.9;
 
 	private static final Random RANDOM = new Random();
 
@@ -39,20 +39,24 @@ public class SOM {
 
 	private Statistics stats;
 
-	@SuppressWarnings("unchecked")
 	public SOM(int numOutput) {
 		super();
 		this.numOutput = numOutput;
-		this.weights = new double[numOutput][];
-		this.outputValueMap = new String[numOutput];
-		this.outputInputFrequencyMap = new HashMap[numOutput];
+	}
+
+	@SuppressWarnings("unchecked")
+	private void initSOM() {
+		weights = new double[numOutput][];
+		outputValueMap = new String[numOutput];
+		outputInputFrequencyMap = new HashMap[numOutput];
 		for (int i = 0; i < outputInputFrequencyMap.length; i++) {
-			this.outputInputFrequencyMap[i] = new HashMap<String, Integer>();
+			outputInputFrequencyMap[i] = new HashMap<String, Integer>();
 		}
 		this.stats = new Statistics(numOutput);
 	}
 
 	public void train(TrainingSet ts, int numIteration) {
+		initSOM();
 		this.numIteration = numIteration;
 		for (countIteration = 0; countIteration < numIteration; countIteration++) {
 			epoch(ts);
@@ -195,6 +199,7 @@ public class SOM {
 
 	public void loadFromFile(File file) {
 		try {
+			initSOM();
 			Scanner scanner = new Scanner(file);
 			numOutput = scanner.nextInt();
 			scanner.nextLine();
@@ -214,4 +219,5 @@ public class SOM {
 			JOptionPane.showMessageDialog(null, "Chosen file is not valid.");
 		}
 	}
+
 }

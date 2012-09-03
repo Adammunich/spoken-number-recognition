@@ -15,6 +15,8 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import main.Constants;
 
 /**
+ * 
+ * @author igorletso
  * @author niktrk
  * 
  */
@@ -79,8 +81,8 @@ public class AudioFileUtil {
 		writeFromStreamToFile(filename, audioInputStream);
 	}
 
-	// filename format i-j.wav; i range is [0..9] and j range is [0,+inf)
 	public static String getInputValueFromFilename(String filename) {
+		// filename format i-j.wav; i range is [0..9] and j range is [0,+inf)
 		String[] tokens = filename.split("-");
 		String beforeLastToken = tokens[tokens.length - 2];
 		return beforeLastToken.substring(beforeLastToken.length() - 1);

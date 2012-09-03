@@ -10,6 +10,12 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.JProgressBar;
 
+/**
+ * 
+ * @author igorletso
+ * @author niktrk
+ * 
+ */
 public abstract class RecordListener implements ActionListener, PropertyChangeListener {
 
 	private JProgressBar progressBar;

@@ -19,11 +19,14 @@ import dsp.transformation.WeightedMFCC;
 import dsp.util.AudioFileUtil;
 
 /**
+ * 
+ * @author igorletso
  * @author niktrk
  * 
  */
 public class SignalProcessor {
 
+	private static final int MAX_DETECTED_FRAMES = 150;
 	private static final int MEL_NUMBER_OF_FILTERS = 31;// 20-40
 	private static final int MFCC_LENGTH = 13;
 
@@ -52,6 +55,9 @@ public class SignalProcessor {
 		}
 		ThresholdEndPointDetection endPointDetection = new EnergyEndPointDetection(frames);
 		List<Frame> removeStartAndEnd = endPointDetection.removeStartAndEnd();
+		if (removeStartAndEnd.size() > MAX_DETECTED_FRAMES) {
+			return null;
+		}
 		double[] result = new double[removeStartAndEnd.size() * MFCC_LENGTH];
 		int k = 0;
 		for (Frame frame : removeStartAndEnd) {

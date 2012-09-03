@@ -3,6 +3,8 @@ package main;
 import javax.sound.sampled.AudioFormat;
 
 /**
+ * 
+ * @author igorletso
  * @author niktrk
  * 
  */

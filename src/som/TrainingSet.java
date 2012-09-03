@@ -1,5 +1,11 @@
 package som;
 
+/**
+ * 
+ * @author igorletso
+ * @author niktrk
+ * 
+ */
 public class TrainingSet {
 
 	private Input[] inputs;

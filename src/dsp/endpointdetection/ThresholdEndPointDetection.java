@@ -3,10 +3,11 @@ package dsp.endpointdetection;
 import java.util.List;
 
 import main.Constants;
-
 import dsp.model.Frame;
 
 /**
+ * 
+ * @author igorletso
  * @author niktrk
  * 
  */

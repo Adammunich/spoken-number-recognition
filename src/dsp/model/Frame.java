@@ -6,6 +6,12 @@ import java.util.List;
 
 import dsp.transformation.Transformation;
 
+/**
+ * 
+ * @author igorletso
+ * @author niktrk
+ * 
+ */
 public class Frame {
 
 	private byte[] originalBuffer;

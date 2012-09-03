@@ -3,6 +3,8 @@ package dsp.transformation;
 import main.Constants;
 
 /**
+ * 
+ * @author igorletso
  * @author niktrk
  * 
  */

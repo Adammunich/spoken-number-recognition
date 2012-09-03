@@ -2,18 +2,26 @@ package test;
 
 import java.util.Arrays;
 
+import javax.sound.sampled.AudioFileFormat;
+
 import som.Input;
 import som.SOM;
 import som.TrainingSet;
 import dsp.SignalProcessor;
 import dsp.util.AudioFileUtil;
 
+/**
+ * 
+ * @author igorletso
+ * @author niktrk
+ * 
+ */
 public class TestRecordMicToFile {
 
 	public static void main(String[] args) {
 
-		// for (int j = 0; j < 5; j++) {
-		// for (int i = 0; i < 10; i++) {
+		// for (int j = 0; j < 1; j++) {
+		// for (int i = 0; i < 1; i++) {
 		// System.out.println("write " + i);
 		// AudioFileUtil.writeFromMicToFile(i + "-" + j + ".wav", 3100);
 		// List<Frame> frames =
@@ -28,11 +36,11 @@ public class TestRecordMicToFile {
 		// }
 		// }
 
-		Input[] inputs = new Input[30];
+		Input[] inputs = new Input[100];
 		int index = 0;
-		for (int i = 1; i < 4; i++) {
+		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
-				String filename = "audio/nikola/" + i + "-" + j + ".wav";
+				String filename = "audio/nikola/" + i + "-" + j + "." + AudioFileFormat.Type.WAVE.getExtension();
 				inputs[index] = new Input(SignalProcessor.process(filename), AudioFileUtil.getInputValueFromFilename(filename));
 				System.out.println(Arrays.toString(inputs[index].getValues()));
 				index++;
@@ -41,7 +49,7 @@ public class TestRecordMicToFile {
 		}
 
 		TrainingSet ts = new TrainingSet(inputs);
-		testit(ts);
+		// testit(ts);
 	}
 
 	private static void testit(TrainingSet ts) {

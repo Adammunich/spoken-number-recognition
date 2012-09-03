@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sound.sampled.AudioFileFormat;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -49,7 +50,10 @@ import net.miginfocom.swing.MigLayout;
 public abstract class MainFrame extends JFrame {
 
 	private static final long serialVersionUID = -3838320390904637165L;
+
 	private JProgressBar trainingProgress;
+	private JLabel digit;
+	private JDialog trainingDialog;
 
 	public MainFrame() {
 		super("Spoken digits recognition");
@@ -62,7 +66,7 @@ public abstract class MainFrame extends JFrame {
 	private void initFrame() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
-		setSize(780, 400);
+		setSize(780, 480);
 	}
 
 	private void setPosition() {
@@ -115,7 +119,7 @@ public abstract class MainFrame extends JFrame {
 		Font labelFont = new Font("Arial", Font.PLAIN, 15);
 		JLabel recDig = new JLabel("Recognized digit: ");
 		Font digitFont = new Font("Arial", Font.BOLD, 25);
-		final JLabel digit = new JLabel();
+		digit = new JLabel();
 		recDig.setFont(labelFont);
 		digit.setFont(digitFont);
 
@@ -142,7 +146,7 @@ public abstract class MainFrame extends JFrame {
 		loadSomDialog.setFileFilter(txtFilter);
 
 		JFileChooser openWavFileDialog = new JFileChooser();
-		FileNameExtensionFilter wavFilter = new FileNameExtensionFilter("Wave files", "wav");
+		FileNameExtensionFilter wavFilter = new FileNameExtensionFilter("Wave files", AudioFileFormat.Type.WAVE.getExtension());
 		openWavFileDialog.addChoosableFileFilter(wavFilter);
 		openWavFileDialog.setFileFilter(wavFilter);
 
@@ -150,13 +154,13 @@ public abstract class MainFrame extends JFrame {
 		cp.add(p);
 
 		up.setBorder(BorderFactory.createTitledBorder("Training"));
-		up.add(fileListScrollPane, "span 1 7, height 200:200:200, width 500:500:500");
-		up.add(openFolder, "wrap 4");
-		up.add(removeFile, "wrap 4");
-		up.add(saveData, "wrap 4");
+		up.add(fileListScrollPane, "span 1 7, height 235:235:235, width 500:500:500");
+		up.add(openFolder, "wrap 3");
+		up.add(removeFile, "wrap 3");
+		up.add(saveData, "wrap 3");
 		up.add(loadData, "wrap 22px");
-		up.add(trainNetwork, "wrap 4");
-		up.add(saveSom, "wrap 4");
+		up.add(trainNetwork, "wrap 3");
+		up.add(saveSom, "wrap 3");
 		up.add(loadSom);
 
 		down.setBorder(BorderFactory.createTitledBorder("Recognition"));
@@ -166,13 +170,13 @@ public abstract class MainFrame extends JFrame {
 		down.add(digit, "wrap");
 		down.add(progressBar);
 
-		p.add(up, "span, height 250:250:250, width 750:750:750");
-		p.add(down, "span, height 90:90:90, width 750:750:750");
+		p.add(up, "span, height 300:300:300, width 750:750:750");
+		p.add(down, "span, height 120:120:120, width 750:750:750");
 
-		JDialog trainingDialog = new JDialog(this);
+		trainingDialog = new JDialog(this);
 		trainingDialog.setTitle("Start training");
 		trainingDialog.setModal(true);
-		trainingDialog.setSize(445, 200);
+		trainingDialog.setSize(510, 200);
 		trainingDialog.setLocationRelativeTo(this);
 		JPanel trainingPanel = new JPanel(new MigLayout());
 		JButton trainSom = new JButton("Start training");
@@ -180,33 +184,31 @@ public abstract class MainFrame extends JFrame {
 		trainingProgress = new JProgressBar();
 		JLabel numIterationLabel = new JLabel("Enter the number of iterations:");
 		trainingPanel.add(numIterationLabel, "gapleft 25, gaptop 50");
-		trainingPanel.add(numIteration, "width 50:50:50");
-		trainingPanel.add(trainSom, "gapleft 50");
-		trainingPanel.add(trainingProgress, "gapleft 25, gaptop 20 ,cell 0 4 4 4, width 350:350:350");
+		trainingPanel.add(numIteration, "width 100:100:100");
+		trainingPanel.add(trainSom);
+		trainingPanel.add(trainingProgress, "gapleft 25, gaptop 20 ,cell 0 4 4 4, width 420:420:420");
 		trainingDialog.add(trainingPanel);
 
 		openFolder.addActionListener(new AproveOpenFolder(openFolderDialog, fileList));
-
 		removeFile.addActionListener(new RemoveFileListener(fileList));
-
 		saveData.addActionListener(new SaveToFileListener(fileList, saveFileDialog));
-
 		loadData.addActionListener(new LoadFromFileListener(fileList, loadFileDialog));
-
 		trainNetwork.addActionListener(new StartTrainingListener(trainingDialog));
 
 		openFile.addActionListener(new OpenRecordFromFileListener(openWavFileDialog) {
+
 			@Override
 			protected void onRecordLoaded(byte[] record) {
-				digit.setText(recognize(record));
+				doRecognition(record);
 			}
+
 		});
 
 		recordButton.addActionListener(new RecordListener(progressBar) {
 
 			@Override
 			protected void onRecordingDone(byte[] recording) {
-				digit.setText(recognize(recording));
+				doRecognition(recording);
 			}
 
 		});
@@ -223,9 +225,7 @@ public abstract class MainFrame extends JFrame {
 				trainingProgress.setMinimum(0);
 				trainingProgress.setMaximum((int) numIteration.getValue());
 
-				SwingWorker<Void, Void> sw = createSwingWorker(filenames, (int) numIteration.getValue());
-				sw.execute();
-
+				createTrainWorker(filenames, (int) numIteration.getValue()).execute();
 			}
 
 		});
@@ -249,10 +249,18 @@ public abstract class MainFrame extends JFrame {
 				}
 			}
 		});
-
 	}
 
-	protected SwingWorker<Void, Void> createSwingWorker(final List<String> filenames, final int numIterations) {
+	private void doRecognition(byte[] signal) {
+		String result = recognize(signal);
+		if (result == null) {
+			JOptionPane.showMessageDialog(this, "Too much noise in signal.", "Error", JOptionPane.ERROR_MESSAGE);
+		} else {
+			digit.setText(result);
+		}
+	}
+
+	protected SwingWorker<Void, Void> createTrainWorker(final List<String> filenames, final int numIterations) {
 		return new SwingWorker<Void, Void>() {
 
 			@Override
@@ -261,7 +269,16 @@ public abstract class MainFrame extends JFrame {
 				return null;
 			}
 
+			@Override
+			protected void done() {
+				trainingDialog.setVisible(false);
+			}
+
 		};
+	}
+
+	public void setTriainingProgress(int n) {
+		trainingProgress.setValue(n);
 	}
 
 	protected abstract String recognize(byte[] record);
@@ -271,9 +288,5 @@ public abstract class MainFrame extends JFrame {
 	protected abstract void saveSomToFile(File file);
 
 	protected abstract void loadSomFromFile(File file);
-
-	public void setProgress(int n) {
-		trainingProgress.setValue(n);
-	}
 
 }

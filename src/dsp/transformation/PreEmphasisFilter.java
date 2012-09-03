@@ -1,7 +1,8 @@
 package dsp.transformation;
 
-
 /**
+ * 
+ * @author igorletso
  * @author niktrk
  * 
  */

@@ -1,6 +1,8 @@
 package som.dtw;
 
 /**
+ * 
+ * @author igorletso
  * @author niktrk
  * 
  */

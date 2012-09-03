@@ -3,6 +3,7 @@ package main;
 import gui.MainFrame;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import som.Input;
@@ -28,11 +29,11 @@ public class AI {
 	}
 
 	private static void initAI() {
-		som = new SOM(3) {
+		som = new SOM(16) {
 
 			@Override
 			protected void onIteration(int iteration) {
-				mainFrame.setProgress(iteration);
+				mainFrame.setTriainingProgress(iteration);
 			}
 
 		};
@@ -45,7 +46,11 @@ public class AI {
 
 			@Override
 			protected String recognize(byte[] record) {
-				return som.findWinnerValue(new Input(SignalProcessor.process(record), "?"));
+				double[] signal = SignalProcessor.process(record);
+				if (signal != null) {
+					return som.findWinnerValue(new Input(signal, "?"));
+				}
+				return null;
 			}
 
 			@Override
@@ -57,6 +62,8 @@ public class AI {
 					inputs[i] = new Input(signal, inputName);
 				}
 				som.train(new TrainingSet(inputs), numIteration);
+				// som.getStats().printAggregated(10, 100);
+				System.out.println(Arrays.toString(som.outputValueMap));
 			}
 
 			@Override

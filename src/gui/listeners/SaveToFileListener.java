@@ -11,6 +11,12 @@ import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 
+/**
+ * 
+ * @author igorletso
+ * @author niktrk
+ * 
+ */
 public class SaveToFileListener implements ActionListener {
 
 	private JList<File> fileList;
@@ -36,7 +42,6 @@ public class SaveToFileListener implements ActionListener {
 			}
 		} catch (IOException e) {
 		}
-
 	}
 
 }

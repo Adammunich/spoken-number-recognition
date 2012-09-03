@@ -1,6 +1,8 @@
 package dsp.model;
 
 /**
+ * 
+ * @author igorletso
  * @author niktrk
  * 
  */

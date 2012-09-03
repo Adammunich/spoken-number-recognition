@@ -8,7 +8,14 @@ import javax.swing.JOptionPane;
 
 import dsp.util.AudioFileUtil;
 
+/**
+ * 
+ * @author igorletso
+ * @author niktrk
+ * 
+ */
 public abstract class OpenRecordFromFileListener implements ActionListener {
+
 	private JFileChooser dialog;
 
 	public OpenRecordFromFileListener(JFileChooser dialog) {
