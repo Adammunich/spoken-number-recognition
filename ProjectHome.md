@@ -1,0 +1,1 @@
+Simple speech recognition program for recognizing numbers from zero to nine implemented using neural networks.
